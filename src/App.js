@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import logo from "./Assets/images/Cabbie.png";
 import "./App.css";
 import HomeScreen from "./Screens/Home/HomeScreen";
@@ -34,7 +34,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<HomeScreen />} />
+        <Route path="/" exact element={<HomeScreen />} />
         <Route path="/Journey" element={<Journey />} />
         <Route path="/Profile" element={<Profile />} />
         <Route path="/ConversationMessage" element={<ConversationMessage />} />
