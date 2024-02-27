@@ -1,13 +1,13 @@
 import React from "react";
- 
+
 const Profile = () => (
   <div className="App">
     <header className="App-header">
- 
+
       <p>
-      Profile
+        Profile
       </p>
-       
+
     </header>
   </div>
 );

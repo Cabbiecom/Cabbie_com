@@ -9,6 +9,10 @@ import Profile from "./Screens/Profile/Profile";
 import ConversationMessage from "./Components/Chat/ConversationMessage.jsx/ConversationMessage";
 import CallMessageConversationMessage from "./Components/Call/CallMessageConversationMessage";
 import ChatMessage from "./Components/Chat/ChatMessage/ChatMessage";
+import EditProfile from "./Components/EditProfile/EditProfile";
+import SignIn from "./Config/SignIn/SignIn";
+import SignUp from "./Config/SingUp/SignUp";
+ 
 
 // Componente SplashScreen
 const SplashScreen = () => (
@@ -38,6 +42,9 @@ function App() {
         <Route path="/Journey" element={<Journey />} />
         <Route path="/Profile" element={<Profile />} />
         <Route path="/ConversationMessage" element={<ConversationMessage />} />
+        <Route path="/EditProfile" element={<EditProfile />} />
+        <Route path="/SignIn" element={<SignIn />} />
+        <Route path="/SignUp" element={<SignUp />} />
         <Route
           path="/CallMessageConversationMessage"
           element={<CallMessageConversationMessage />}

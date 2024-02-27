@@ -23,7 +23,6 @@ import Menu from "@mui/material/Menu";
 import MapsApI from "../../Components/GoogleMaps/GoogleMaps";
 import MenuItem from "@mui/material/MenuItem";
 import Divider from "@mui/material/Divider";
-import PersonAdd from "@mui/icons-material/PersonAdd";
 import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -33,10 +32,15 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import avatar1 from "../../Assets/images/CabbieX.jpeg";
 import avatar2 from "../../Assets/images/CabbieXL.jpeg";
 import { useNavigate } from "react-router-dom";
-import CallEndIcon from "@mui/icons-material/CallEnd";
-import MicIcon from "@mui/icons-material/Mic";
-import MicOffIcon from "@mui/icons-material/MicOff";
-import { Chat } from "@mui/icons-material";
+import {
+  Chat,
+} from "@mui/icons-material";
+import LocalTaxiIcon from '@mui/icons-material/LocalTaxi';
+import { signOut } from "firebase/auth";
+import { auth } from '../../Data/Database';
+import { useAuthState } from "react-firebase-hooks/auth";
+import { getDatabase, ref as dbRef, set, get } from "firebase/database";
+
 
 const drawerBleeding = 56;
 
@@ -66,16 +70,50 @@ const Puller = () => (
   />
 );
 
+
+
 const Journey = () => {
+  const [user, loading, error] = useAuthState(auth);
+  const [name, setName] = useState('');
+  const [photoURL, setPhotoURL] = useState('');
   const [container, setContainer] = useState(undefined);
+
+  const database = getDatabase();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       setContainer(window.document.body);
     }
-  }, []);
+    if (user) {
+      setName(user.displayName || 'Usuario Anónimo');
+      setPhotoURL(user.photoURL || '');
+
+      const userRef = dbRef(database, `Users/UsersClient/${user.uid}`);
+      get(userRef).then((snapshot) => {
+        if (snapshot.exists()) {
+          const userData = snapshot.val();
+          setName(userData.name);
+          setPhotoURL(userData.imageUrl);
+        } else {
+          console.log("No se encontraron datos del usuario en la base de datos.");
+        }
+      }).catch((error) => {
+        console.error("Error al obtener datos del usuario:", error);
+      });
+    }
+  }, [user, database]);
 
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    signOut(auth).then(() => {
+      // Cierre de sesión exitoso, redirigir al usuario
+      navigate("/SignIn");
+    }).catch((error) => {
+      // Ocurrió un error en el cierre de sesión
+      console.error("Error al cerrar sesión: ", error);
+    });
+  };
 
   const HandleNavegateComponents = () => {
     navigate("/ConversationMessage");
@@ -131,16 +169,22 @@ const Journey = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const openHandle = Boolean(anchorEl);
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
   const handleClose = () => {
     setAnchorEl(null);
+
   };
 
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
+  };
+
+  const handleOpenDrawer = () => {
+    setOpen(true);
   };
 
   return (
@@ -154,7 +198,7 @@ const Journey = () => {
           },
         }}
       />
-      <AppBar position="static" sx={{ borderRadius: 2, background: "#000" }}>
+      <AppBar position="static" sx={{ borderRadius: 1, background: "#000" }}>
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             CABBIE
@@ -170,9 +214,11 @@ const Journey = () => {
         </Toolbar>
       </AppBar>
       <Menu
+        open={openHandle}
+
         anchorEl={anchorEl}
         id="account-menu"
-        open={openHandle}
+
         onClose={handleClose}
         onClick={handleClose}
         PaperProps={{
@@ -204,13 +250,21 @@ const Journey = () => {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
+
         <MenuItem onClick={handleClose}>
-          <Avatar /> Profile
-        </MenuItem>
-        <MenuItem onClick={handleClose}>
-          <Avatar /> My account
+          <Avatar src={photoURL} /> {name}
         </MenuItem>
         <Divider />
+        <MenuItem
+          onClick={
+            handleOpenDrawer
+          }
+        >
+          <ListItemIcon>
+            <LocalTaxiIcon fontSize="small" />
+          </ListItemIcon>
+          TAX Seguro
+        </MenuItem>
         <MenuItem
           onClick={() => {
             navigate("/ChatMessage");
@@ -221,13 +275,15 @@ const Journey = () => {
           </ListItemIcon>
           Chat
         </MenuItem>
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={() => {
+          navigate("/EditProfile");
+        }}>
           <ListItemIcon>
             <Settings fontSize="small" />
           </ListItemIcon>
           Settings
         </MenuItem>
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={handleLogout}>
           <ListItemIcon>
             <Logout fontSize="small" />
           </ListItemIcon>
@@ -275,8 +331,8 @@ const Journey = () => {
             pb: 2,
             height: "100%",
             overflow: "auto",
-            background: "#000",
-            color: "white",
+            background: "#E0E0E0",
+            color: "#000",
           }}
         >
           <List sx={{ width: "100%" }}>
