@@ -61,7 +61,7 @@ const SignIn = () => {
             if (snapshot.exists()) {
                 console.log(snapshot.val());
                 // Aquí puedes hacer algo con los datos del usuario
-                navigate("https://cabbiecom.github.io/Cabbie_com/"); // Redirige al usuario después de iniciar sesión y obtener datos
+                navigate("/"); // Redirige al usuario después de iniciar sesión y obtener datos
             } else {
                 showAlert("No se encontraron datos de usuario.", "warning");
             }
