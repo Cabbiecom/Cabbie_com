@@ -12,7 +12,6 @@ import ChatMessage from "./Components/Chat/ChatMessage/ChatMessage";
 import EditProfile from "./Components/EditProfile/EditProfile";
 import SignIn from "./Config/SignIn/SignIn";
 import SignUp from "./Config/SingUp/SignUp";
- 
 
 // Componente SplashScreen
 const SplashScreen = () => (
@@ -38,12 +37,12 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" exact element={<HomeScreen />} />
+        <Route path="/" exact element={<SignIn />} />
+        <Route path="/HomeScreen" element={<HomeScreen />} />
         <Route path="/Journey" element={<Journey />} />
         <Route path="/Profile" element={<Profile />} />
         <Route path="/ConversationMessage" element={<ConversationMessage />} />
         <Route path="/EditProfile" element={<EditProfile />} />
-        <Route path="/SignIn" element={<SignIn />} />
         <Route path="/SignUp" element={<SignUp />} />
         <Route
           path="/CallMessageConversationMessage"

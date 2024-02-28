@@ -108,7 +108,7 @@ const Journey = () => {
   const handleLogout = () => {
     signOut(auth).then(() => {
       // Cierre de sesión exitoso, redirigir al usuario
-      navigate("/SignIn");
+      navigate("/");
     }).catch((error) => {
       // Ocurrió un error en el cierre de sesión
       console.error("Error al cerrar sesión: ", error);

@@ -61,7 +61,7 @@ const SignIn = () => {
             if (snapshot.exists()) {
                 console.log(snapshot.val());
                 // Aquí puedes hacer algo con los datos del usuario
-                navigate("/"); // Redirige al usuario después de iniciar sesión y obtener datos
+                navigate("/HomeScreen"); // Redirige al usuario después de iniciar sesión y obtener datos
             } else {
                 showAlert("No se encontraron datos de usuario.", "warning");
             }
@@ -88,7 +88,7 @@ const SignIn = () => {
 
                     showAlert(`Se inicio sesión correctamente en Google: ${result.user}`);
 
-                    navigate("/"); // Redirige al usuario después de iniciar sesión
+                    navigate("/HomeScreen"); // Redirige al usuario después de iniciar sesión
                 }
             })
             .catch((error) => {
