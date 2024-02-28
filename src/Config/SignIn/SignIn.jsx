@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
@@ -12,6 +12,8 @@ import {
     signInWithEmailAndPassword,
     GoogleAuthProvider,
     signInWithPopup,
+    signInWithRedirect,
+    getRedirectResult,
 } from "firebase/auth";
 // Importa el ícono de Google si estás usando Material Icons
 import GoogleIcon from "@mui/icons-material/Google";
@@ -59,7 +61,7 @@ const SignIn = () => {
             if (snapshot.exists()) {
                 console.log(snapshot.val());
                 // Aquí puedes hacer algo con los datos del usuario
-                navigate("/"); // Redirige al usuario después de iniciar sesión y obtener datos
+                navigate("https://cabbiecom.github.io/Cabbie_com/"); // Redirige al usuario después de iniciar sesión y obtener datos
             } else {
                 showAlert("No se encontraron datos de usuario.", "warning");
             }
@@ -72,12 +74,28 @@ const SignIn = () => {
     const handleGoogleSignIn = async () => {
         const provider = new GoogleAuthProvider();
         try {
-            await signInWithPopup(auth, provider);
-            navigate("/"); // Redirige al usuario después de iniciar sesión
+            await signInWithRedirect(auth, provider);
         } catch (error) {
-            console.error("Error en el inicio de sesión con Google: ", error.message);
+            showAlert(`Error en el inicio de sesión con Google: ${error.message}`);
         }
     };
+
+    useEffect(() => {
+        getRedirectResult(auth)
+            .then((result) => {
+                if (result) {
+                    // El usuario ha iniciado sesión correctamente, puedes obtener el usuario de result.user
+
+                    showAlert(`Se inicio sesión correctamente en Google: ${result.user}`);
+
+                    navigate("/"); // Redirige al usuario después de iniciar sesión
+                }
+            })
+            .catch((error) => {
+                showAlert(`Error al obtener el resultado de la redirección: ${error.message}`);
+            });
+    }, []);
+
 
     return (
         <Container component="main" maxWidth="xs" >
