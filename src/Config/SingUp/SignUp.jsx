@@ -71,7 +71,7 @@ const SignUp = () => {
             });
 
             handleOpenSnackbar(`Usuario registrado con éxito, y la imagen fue subida: ${user}`);
-            navigate("/");
+            navigate("/HomeScreen");
         } catch (error) {
 
             handleOpenSnackbar(`Error al registrar el usuario: ${error.message}`);

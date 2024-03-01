@@ -27,13 +27,12 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 const SignIn = () => {
     const [openAlert, setOpenAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState("");
-    const [alertSeverity, setAlertSeverity] = useState("error"); // Puedes usar 'error', 'warning', 'info', 'success'
-
+    const [alertSeverity, setAlertSeverity] = useState("info"); // Puedes usar 'error', 'warning', 'info', 'success'
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const showAlert = (message, severity = "error") => {
+    const showAlert = (message, severity = "info") => {
         setAlertMessage(message);
         setAlertSeverity(severity);
         setOpenAlert(true);
@@ -67,16 +66,6 @@ const SignIn = () => {
             }
         } catch (error) {
             showAlert(`Error en el inicio de sesión: ${error.message}`, "error");
-        }
-    };
-
-    // Función simulada para el inicio de sesión con Google
-    const handleGoogleSignIn = async () => {
-        const provider = new GoogleAuthProvider();
-        try {
-            await signInWithRedirect(auth, provider);
-        } catch (error) {
-            showAlert(`Error en el inicio de sesión con Google: ${error.message}`);
         }
     };
 
@@ -154,25 +143,10 @@ const SignIn = () => {
                             >
                                 Iniciar sesión
                             </Button>
-
-                            <Grid container>
-                                <Grid item xs>
-                                    {/* Botón de Google */}
-                                    <Button
-                                        startIcon={<GoogleIcon />}
-                                        fullWidth
-                                        variant="outlined"
-                                        onClick={handleGoogleSignIn}
-                                        sx={{ color: "#000" }}
-                                    >
-                                        Inicia sesión con Google
-                                    </Button>
-                                </Grid>
-                            </Grid>
                         </Box>
                     </CardContent>
                 </Card>
-                <Divider />
+
                 <Box
                     sx={{
                         marginTop: 2,

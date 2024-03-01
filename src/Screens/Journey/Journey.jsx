@@ -32,15 +32,12 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import avatar1 from "../../Assets/images/CabbieX.jpeg";
 import avatar2 from "../../Assets/images/CabbieXL.jpeg";
 import { useNavigate } from "react-router-dom";
-import {
-  Chat,
-} from "@mui/icons-material";
-import LocalTaxiIcon from '@mui/icons-material/LocalTaxi';
+import { Chat } from "@mui/icons-material";
+import LocalTaxiIcon from "@mui/icons-material/LocalTaxi";
 import { signOut } from "firebase/auth";
-import { auth } from '../../Data/Database';
+import { auth } from "../../Data/Database";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { getDatabase, ref as dbRef, set, get } from "firebase/database";
-
 
 const drawerBleeding = 56;
 
@@ -70,14 +67,13 @@ const Puller = () => (
   />
 );
 
-
-
 const Journey = () => {
   const [user, loading, error] = useAuthState(auth);
-  const [name, setName] = useState('');
-  const [photoURL, setPhotoURL] = useState('');
+  const [name, setName] = useState("");
+  const [photoURL, setPhotoURL] = useState("");
   const [container, setContainer] = useState(undefined);
-
+  const [taxiUsers, setTaxiUsers] = useState([]);
+  const navigate = useNavigate();
   const database = getDatabase();
 
   useEffect(() => {
@@ -85,34 +81,61 @@ const Journey = () => {
       setContainer(window.document.body);
     }
     if (user) {
-      setName(user.displayName || 'Usuario Anónimo');
-      setPhotoURL(user.photoURL || '');
+      setName(user.displayName || "Usuario Anónimo");
+      setPhotoURL(user.photoURL || "");
 
       const userRef = dbRef(database, `Users/UsersClient/${user.uid}`);
-      get(userRef).then((snapshot) => {
+      get(userRef)
+        .then((snapshot) => {
+          if (snapshot.exists()) {
+            const userData = snapshot.val();
+            setName(userData.name);
+            setPhotoURL(userData.imageUrl);
+
+          } else {
+            console.log(
+              "No se encontraron datos del usuario en la base de datos."
+            );
+          }
+        })
+        .catch((error) => {
+          console.error("Error al obtener datos del usuario:", error);
+        });
+    }
+  }, [user, database]);
+
+  useEffect(() => {
+    if (user && database) {
+      // Referencia a todos los usuarios clientes
+      const usersRef = dbRef(database, "Users/UsersClient");
+
+      get(usersRef).then((snapshot) => {
         if (snapshot.exists()) {
-          const userData = snapshot.val();
-          setName(userData.name);
-          setPhotoURL(userData.imageUrl);
+          const usersData = snapshot.val();
+          // Filtrar por usuarios con el rol de "taxista"
+          const taxiUsersFiltered = Object.entries(usersData)
+            .filter(([key, value]) => value.role === "taxista")
+            .map(([key, value]) => ({ uid: key, ...value }));
+          setTaxiUsers(taxiUsersFiltered);
         } else {
-          console.log("No se encontraron datos del usuario en la base de datos.");
+          console.log("No se encontraron datos de usuarios en la base de datos.");
         }
       }).catch((error) => {
-        console.error("Error al obtener datos del usuario:", error);
+        console.error("Error al obtener datos de los usuarios:", error);
       });
     }
   }, [user, database]);
 
-  const navigate = useNavigate();
-
   const handleLogout = () => {
-    signOut(auth).then(() => {
-      // Cierre de sesión exitoso, redirigir al usuario
-      navigate("/");
-    }).catch((error) => {
-      // Ocurrió un error en el cierre de sesión
-      console.error("Error al cerrar sesión: ", error);
-    });
+    signOut(auth)
+      .then(() => {
+        // Cierre de sesión exitoso, redirigir al usuario
+        navigate("/");
+      })
+      .catch((error) => {
+        // Ocurrió un error en el cierre de sesión
+        console.error("Error al cerrar sesión: ", error);
+      });
   };
 
   const HandleNavegateComponents = () => {
@@ -123,33 +146,7 @@ const Journey = () => {
     navigate("/CallMessageConversationMessage");
   };
 
-  const dataList = [
-    {
-      id: 1,
-      name: "Usuario 1",
-      rating: 4,
-      avatar: avatar1,
-    },
-    {
-      id: 2,
-      name: "Usuario 2",
-      rating: 5,
-      avatar: avatar2,
-    },
-    {
-      id: 3,
-      name: "Usuario 3",
-      rating: 2,
-      avatar: avatar1,
-    },
-    {
-      id: 4,
-      name: "Usuario 4",
-      rating: 3,
-      avatar: avatar2,
-    },
-    // Agrega más usuarios según sea necesario
-  ];
+  var rating = "4";
 
   const contarUsuarios = (dataList) => {
     return dataList.length;
@@ -176,7 +173,6 @@ const Journey = () => {
 
   const handleClose = () => {
     setAnchorEl(null);
-
   };
 
   const toggleDrawer = (newOpen) => () => {
@@ -215,10 +211,8 @@ const Journey = () => {
       </AppBar>
       <Menu
         open={openHandle}
-
         anchorEl={anchorEl}
         id="account-menu"
-
         onClose={handleClose}
         onClick={handleClose}
         PaperProps={{
@@ -250,16 +244,11 @@ const Journey = () => {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-
         <MenuItem onClick={handleClose}>
           <Avatar src={photoURL} /> {name}
         </MenuItem>
         <Divider />
-        <MenuItem
-          onClick={
-            handleOpenDrawer
-          }
-        >
+        <MenuItem onClick={handleOpenDrawer}>
           <ListItemIcon>
             <LocalTaxiIcon fontSize="small" />
           </ListItemIcon>
@@ -275,9 +264,11 @@ const Journey = () => {
           </ListItemIcon>
           Chat
         </MenuItem>
-        <MenuItem onClick={() => {
-          navigate("/EditProfile");
-        }}>
+        <MenuItem
+          onClick={() => {
+            navigate("/EditProfile");
+          }}
+        >
           <ListItemIcon>
             <Settings fontSize="small" />
           </ListItemIcon>
@@ -322,7 +313,7 @@ const Journey = () => {
           <Puller />
 
           <Typography sx={{ p: 2, color: "white" }}>
-            Taxis disponibles: {contarUsuarios(dataList)}
+            Taxis disponibles: {taxiUsers.length}
           </Typography>
         </StyledBox>
         <StyledBox
@@ -336,8 +327,9 @@ const Journey = () => {
           }}
         >
           <List sx={{ width: "100%" }}>
-            {dataList.map((item, index) => (
+          {taxiUsers.map((taxiUser, index) => (
               <ListItem
+              key={index}
                 divider
                 sx={{
                   background: "#fff",
@@ -347,7 +339,7 @@ const Journey = () => {
               >
                 <ListItemAvatar>
                   <Avatar
-                    src={item.avatar}
+                    src={taxiUser.imageUrl || ""}
                     sx={{
                       color: "black",
                       Width: "100%",
@@ -358,8 +350,8 @@ const Journey = () => {
                 </ListItemAvatar>
                 <ListItemText
                   sx={{ color: "black" }}
-                  primary={item.name}
-                  secondary={generateRating(item.rating)}
+                  primary={taxiUser.name}
+                  secondary={generateRating(taxiUser.rating)}
                 />
                 <ListItemIcon>
                   <IconButton

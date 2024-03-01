@@ -32,6 +32,9 @@ import MicIcon from "@mui/icons-material/Mic";
 import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import { auth } from "../../../Data/Database";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { getDatabase, ref as dbRef, set, get } from "firebase/database";
 
 const ConversationMessage = () => {
   const [message, setMessage] = useState("");
@@ -42,6 +45,10 @@ const ConversationMessage = () => {
   //message menu
   const [anchorElMenu, setAnchorElMenu] = useState(null);
   const [selectedMessage, setSelectedMessage] = useState(null);
+  //DataBase
+  const [taxiUsers, setTaxiUsers] = useState([]);
+  const [user, loading, error] = useAuthState(auth);
+  const database = getDatabase();
 
   const handleOpenMenu = (event, message) => {
     setAnchorElMenu(event.currentTarget);
@@ -111,6 +118,30 @@ const ConversationMessage = () => {
     setAnchorEl(null);
   };
 
+
+  //Traida de datos de Usuario
+  useEffect(() => {
+    if (user && database) {
+      // Referencia a todos los usuarios clientes
+      const usersRef = dbRef(database, "Users/UsersClient");
+
+      get(usersRef).then((snapshot) => {
+        if (snapshot.exists()) {
+          const usersData = snapshot.val();
+          // Filtrar por usuarios con el rol de "taxista"
+          const taxiUsersFiltered = Object.entries(usersData)
+            .filter(([key, value]) => value.role === "taxista")
+            .map(([key, value]) => ({ uid: key, ...value }));
+          setTaxiUsers(taxiUsersFiltered);
+        } else {
+          console.log("No se encontraron datos de usuarios en la base de datos.");
+        }
+      }).catch((error) => {
+        console.error("Error al obtener datos de los usuarios:", error);
+      });
+    }
+  }, [user, database]);
+
   return (
     <>
       <CssBaseline />
@@ -122,45 +153,50 @@ const ConversationMessage = () => {
           background: "#000",
         }}
       >
-        <Toolbar>
-          {/* Ícono de flecha para regresar */}
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="back"
-            onClick={handleBack}
-          >
-            <ArrowBackIcon />
-          </IconButton>
+        {taxiUsers.map((taxiUser, index) => (
+          <Toolbar>
 
-          {/* Avatar y nombre del usuario */}
-          <Avatar alt="Nombre Usuario" src={profile} sx={{ ml: 2 }} />
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ flexGrow: 1, ml: 1 }}
-          >
-            Nombre Usuario
-          </Typography>
+            < IconButton
+              edge="start"
+              color="inherit"
+              aria-label="back"
+              onClick={handleBack}
+            >
+              <ArrowBackIcon />
+            </IconButton >
 
-          {/* Íconos a la derecha */}
-          <IconButton
-            color="inherit"
-            onClick={() => {
-              navigate("/CallMessageConversationMessage");
-            }}
-          >
-            <PhoneIcon />
-          </IconButton>
-          <IconButton color="inherit">
-            <VideocamIcon />
-          </IconButton>
+            {/* Avatar y nombre del usuario */}
+            < Avatar src={taxiUser.imageUrl || ""} sx={{ ml: 2 }} />
+            <Typography
+              variant="h6"
+              noWrap
+              component="div"
+              sx={{ flexGrow: 1, ml: 1, color:'#fff' }}
+               
+            >
+              {taxiUser.name}
+            </Typography>
 
-          <IconButton color="inherit" onClick={handleClick}>
-            <MoreVertIcon />
-          </IconButton>
-        </Toolbar>
+            {/* Íconos a la derecha */}
+            <IconButton
+              color="inherit"
+              onClick={() => {
+                navigate("/CallMessageConversationMessage");
+              }}
+            >
+              <PhoneIcon />
+            </IconButton>
+            <IconButton color="inherit">
+              <VideocamIcon />
+            </IconButton>
+
+            <IconButton color="inherit" onClick={handleClick}>
+              <MoreVertIcon />
+            </IconButton>
+
+
+          </Toolbar>
+        ))}
         <Menu
           anchorEl={anchorEl}
           id="account-menu"
@@ -198,13 +234,13 @@ const ConversationMessage = () => {
         >
           <MenuItem onClick={handleClose}>Ver Contacto</MenuItem>
           <Divider />
-          <MenuItem onClick={() => {}}>Buscar</MenuItem>
+          <MenuItem onClick={() => { }}>Buscar</MenuItem>
           <MenuItem onClick={handleClose}>Vaciar chat</MenuItem>
 
           <MenuItem onClick={handleClose}>Fondo de pantalla</MenuItem>
           <MenuItem onClick={handleClose}>Mensajes Temporales</MenuItem>
         </Menu>
-      </AppBar>
+      </AppBar >
       <Toolbar />
       <Box
         sx={{
@@ -268,7 +304,7 @@ const ConversationMessage = () => {
           value={message}
           onChange={handleMessageChange}
           sx={{
-         
+
             ".MuiFilledInput-root": {
               backgroundColor: "#000",
               color: "#fff",
@@ -306,10 +342,10 @@ const ConversationMessage = () => {
             ),
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton onClick={() => {}}>
+                <IconButton onClick={() => { }}>
                   <AttachFileIcon sx={{ color: "#fff" }} />
                 </IconButton>
-                <IconButton onClick={() => {}}>
+                <IconButton onClick={() => { }}>
                   <CameraAltIcon sx={{ color: "#fff" }} />
                 </IconButton>
                 <IconButton onClick={message ? handleSendMessage : null}>
