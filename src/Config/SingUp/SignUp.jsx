@@ -88,7 +88,10 @@ const SignUp = () => {
     return (
         <>
             <Container component="main" maxWidth="xs" >
-                <Box sx={{ mt: 4, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Box sx={{
+                    mt: 4, display: 'flex',
+                    flexDirection: 'column', alignItems: 'center'
+                }}>
                     <Typography variant="h5">Registro de Usuario</Typography>
                     <TextField
                         margin="normal"

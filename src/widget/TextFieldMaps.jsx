@@ -1,7 +1,5 @@
 import {
-    Autocomplete,
     Box,
-    Button,
     IconButton,
     TextField,
     SwipeableDrawer,
@@ -11,8 +9,6 @@ import {
     Avatar,
     ListItemText,
     ListItemIcon,
-    Select,
-    MenuItem,
     Typography,
     Card,
     CardContent,
@@ -22,14 +18,11 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
     useLoadScript,
     GoogleMap,
-    Marker,
     StandaloneSearchBox,
     DirectionsRenderer,
 } from "@react-google-maps/api";
 import { LocationOnOutlined, ShareLocationOutlined } from "@mui/icons-material";
-import { Global } from "@emotion/react";
 import { styled } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
 import { grey } from "@mui/material/colors";
 import { auth } from "../Data/Database";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -112,7 +105,7 @@ const TextFieldMaps = () => {
 
     //Constatntes del Alert
     const [showAlert, setShowAlert] = useState(false);
-    const [alertMessage, setAlertMessage] = useState('');
+    const [alertMessage, setAlertMessage] = useState("");
 
     // Renderizado del mapa de google
     const mapRef = useRef(null);
@@ -179,9 +172,8 @@ const TextFieldMaps = () => {
         setOpen(true);
     };
 
-    // 
+    //
     const handleShareMapsClick = async () => {
-
         if (originAddress === "" || destinationAddress === "") {
             setAlertMessage("Origen o destino no especificado.");
             setShowAlert(true);
@@ -189,31 +181,33 @@ const TextFieldMaps = () => {
         }
 
         // Aquí se asume que `originAddress` y `destinationAddress` contienen direcciones o coordenadas válidas.
-        const googleMapsRouteUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(originAddress)}&destination=${encodeURIComponent(destinationAddress)}&travelmode=driving`;
+        const googleMapsRouteUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(
+            originAddress
+        )}&destination=${encodeURIComponent(
+            destinationAddress
+        )}&travelmode=driving`;
 
         if (navigator.share) {
             try {
                 await navigator.share({
-                    title: 'Compartir Ubicación',
-                    text: 'Mira esta ubicación en el mapa.',
+                    title: "Compartir Ubicación",
+                    text: "Mira esta ubicación en el mapa.",
                     url: googleMapsRouteUrl,
-
                 });
             } catch (error) {
-                setAlertMessage('Error compartiendo la ubicación');
+                setAlertMessage("Error compartiendo la ubicación");
                 setShowAlert(true);
             }
         } else {
             // Opcionalmente, aquí puedes manejar la situación para navegadores que no soporten navigator.share
-            setAlertMessage('Compartir no es soportado en este navegador.');
+            setAlertMessage("Compartir no es soportado en este navegador.");
             setShowAlert(true);
         }
     };
 
-
     // Localizar taxi
     const HandleLocation = () => {
-        const taxista = taxiUsers.find(user => user.role === "taxista");
+        const taxista = taxiUsers.find((user) => user.role === "taxista");
         console.log(taxista); // Depurar el usuario taxista encontrado
 
         const taxistaLocation = taxista?.ubication;
@@ -276,20 +270,21 @@ const TextFieldMaps = () => {
 
     return (
         <>
-
-            <Box sx={{
-                height: "90vh",
-                width: "100%",
-                position: "relative",
-                justifyContent: 'center',
-                alignContent: 'center',
-                alignItems: 'center'
-            }}>
+            <Box
+                sx={{
+                    height: "90vh",
+                    width: "100%",
+                    position: "relative",
+                    justifyContent: "center",
+                    alignContent: "center",
+                    alignItems: "center",
+                }}
+            >
                 <Box
                     sx={{
-                        justifyContent: 'center',
-                        alignContent: 'center',
-                        alignItems: 'center',
+                        justifyContent: "center",
+                        alignContent: "center",
+                        alignItems: "center",
                         position: mapVisible ? "fixed" : "absolute",
                         top: mapVisible ? "40%" : "40%",
                         left: "50%",
@@ -303,7 +298,6 @@ const TextFieldMaps = () => {
                         padding: mapVisible ? 1 : 0,
                         borderRadius: mapVisible ? 2 : 0,
                         background: mapVisible ? "#FFFFFF" : "none",
-
                     }}
                 >
                     <StandaloneSearchBox
@@ -382,8 +376,7 @@ const TextFieldMaps = () => {
                             </IconButton>
                             <IconButton onClick={handleShareMapsClick}>
                                 Share
-                                <ShareLocationOutlined
-                                    sx={{ color: "red" }} fontSize="small" />
+                                <ShareLocationOutlined sx={{ color: "red" }} fontSize="small" />
                             </IconButton>
                         </CardContent>
                     </Card>
@@ -392,10 +385,10 @@ const TextFieldMaps = () => {
                     sx={{
                         display: "flex",
                         flexDirection: "column",
-                        justifyContent: 'center',
-                        alignContent: 'center',
-                        alignItems: 'center',
-                        marginTop: '-8%'
+                        justifyContent: "center",
+                        alignContent: "center",
+                        alignItems: "center",
+                        marginTop: "-8%",
                     }}
                 >
                     {mapVisible && (
@@ -516,17 +509,14 @@ const TextFieldMaps = () => {
                     </StyledBox>
                 </SwipeableDrawer>
             </Box>
-            {
-                showAlert && (
-                    <Alert
-                        severity="error"
-                        onClose={() => setShowAlert(false)} // Permite cerrar el alert
-                    >
-                        {alertMessage}
-                    </Alert>
-                )
-            }
-
+            {showAlert && (
+                <Alert
+                    severity="error"
+                    onClose={() => setShowAlert(false)} // Permite cerrar el alert
+                >
+                    {alertMessage}
+                </Alert>
+            )}
         </>
     );
 };

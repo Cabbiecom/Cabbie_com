@@ -4,35 +4,21 @@ import { Global } from "@emotion/react";
 import { styled } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { grey } from "@mui/material/colors";
-import {
-  Box,
-  List,
-  ListItem,
-  ListItemAvatar,
-  Avatar,
-  ListItemText,
-  ListItemIcon,
-  IconButton,
-} from "@mui/material";
+import { Box, Avatar, ListItemIcon, IconButton } from "@mui/material";
 
 import Typography from "@mui/material/Typography";
-import SwipeableDrawer from "@mui/material/SwipeableDrawer";
+
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Menu from "@mui/material/Menu";
-import MapsApI from "../../Components/GoogleMaps/GoogleMaps";
 import MenuItem from "@mui/material/MenuItem";
 import Divider from "@mui/material/Divider";
 import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
 import StarIcon from "@mui/icons-material/Star";
-import ChatIcon from "@mui/icons-material/Chat";
-import PhoneIcon from "@mui/icons-material/Phone";
-import avatar1 from "../../Assets/images/CabbieX.jpeg";
-import avatar2 from "../../Assets/images/CabbieXL.jpeg";
 import { useNavigate } from "react-router-dom";
-import { Chat, LocationOnOutlined } from "@mui/icons-material";
+import { Chat } from "@mui/icons-material";
 import LocalTaxiIcon from "@mui/icons-material/LocalTaxi";
 import { signOut } from "firebase/auth";
 import { auth } from "../../Data/Database";
@@ -190,7 +176,7 @@ const Journey = () => {
   const [taxiLocation, setTaxiLocation] = useState({ lat: null, lng: null });
 
   const HandleLocation = () => {
-    const taxista = taxiUsers.find(user => user.role === "taxista");
+    const taxista = taxiUsers.find((user) => user.role === "taxista");
     console.log(taxista); // Depurar el usuario taxista encontrado
 
     const taxistaLocation = taxista?.ubication;
@@ -201,12 +187,11 @@ const Journey = () => {
     }
   };
 
-
   const updateMap = (location) => {
-    console.log(`Actualizando el mapa a la nueva ubicación: ${location.lat}, ${location.lng}`);
+    console.log(
+      `Actualizando el mapa a la nueva ubicación: ${location.lat}, ${location.lng}`
+    );
   };
-
-
 
   return (
     <Root>
@@ -309,7 +294,6 @@ const Journey = () => {
       <Box sx={{ textAlign: "center", pt: 1 }}>
         <TextFieldMaps />
       </Box>
-
     </Root>
   );
 };
