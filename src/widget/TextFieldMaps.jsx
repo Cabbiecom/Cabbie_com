@@ -13,6 +13,7 @@ import {
     Card,
     CardContent,
     Alert,
+    Fab,
 } from "@mui/material";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
@@ -21,7 +22,7 @@ import {
     StandaloneSearchBox,
     DirectionsRenderer,
 } from "@react-google-maps/api";
-import { LocationOnOutlined, ShareLocationOutlined } from "@mui/icons-material";
+import { LocationOnOutlined, Minimize, MyLocation, ShareLocationOutlined } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import { grey } from "@mui/material/colors";
 import { auth } from "../Data/Database";
@@ -31,6 +32,7 @@ import { useNavigate } from "react-router-dom";
 import StarIcon from "@mui/icons-material/Star";
 import ChatIcon from "@mui/icons-material/Chat";
 import PhoneIcon from "@mui/icons-material/Phone";
+import Draggable from "react-draggable";
 
 const libraries = ["places"];
 
@@ -145,7 +147,12 @@ const TextFieldMaps = () => {
             }
         }
     };
+    // Funcion toogle
+    const [BoxVisible, setBoxVisible] = useState(true);
 
+    const toggleBoxVisibility = () => {
+        setBoxVisible(!BoxVisible);
+    };
     // Funcione del Drawer
     const toggleDrawer = (open) => (event) => {
         if (
@@ -280,115 +287,127 @@ const TextFieldMaps = () => {
                     alignItems: "center",
                 }}
             >
+                <Draggable>
+                    <Box
+                        sx={{
+                            justifyContent: "center",
+                            alignContent: "center",
+                            alignItems: "center",
+                            position: mapVisible ? "fixed" : "absolute",
+                            top: mapVisible ? "40%" : "40%",
+                            left: "50%",
+                            transform: "translate(-50%, -50%)",
+                            zIndex: 2,
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            gap: 2,
+                            width: BoxVisible ? "auto" : "56px",
+
+                            padding: BoxVisible ? 1 : 0,
+                            borderRadius: mapVisible ? 2 : 0,
+                            background: mapVisible ? "#FFFFFF" : "none",
+                        }}
+                    >
+                        <IconButton onClick={toggleBoxVisibility} sx={{ alignSelf: 'flex-end' }}>
+                            <Minimize />
+                        </IconButton>
+                        {BoxVisible && (
+                            <><StandaloneSearchBox
+                                onLoad={setOriginSearchBox}
+                                onPlacesChanged={onOriginPlacesChanged}
+                            >
+                                <TextField
+                                    label="Enter origin"
+                                    variant="filled"
+                                    sx={{
+                                        width: "100%",
+                                        backgroundColor: "#EDEDED",
+                                        borderRadius: 2,
+                                        "& .MuiFilledInput-underline:before": {
+                                            borderBottom: "none", // Elimina la línea inferior en el estado normal
+                                        },
+                                        "& .MuiFilledInput-underline:after": {
+                                            borderBottom: "none", // Elimina la línea inferior en el estado activo/foco
+                                        },
+                                        "& .MuiFilledInput-underline:hover:before": {
+                                            borderBottom: "none", // Elimina la línea inferior al pasar el ratón por encima
+                                        },
+                                        "& .MuiFilledInput-root": {
+                                            backgroundColor: "rgba(0,0,0,0)", // Hace el fondo transparente
+                                            "&:hover": {
+                                                backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente al pasar el ratón por encima
+                                            },
+                                            "&.Mui-focused": {
+                                                backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente en el estado de foco
+                                            },
+                                        },
+                                    }}
+                                    value={originAddress}
+                                    onChange={(e) => setOriginAddress(e.target.value)}
+                                />
+                            </StandaloneSearchBox>
+                                <StandaloneSearchBox
+                                    onLoad={setDestinationSearchBox}
+                                    onPlacesChanged={onDestinationPlacesChanged}
+                                >
+                                    <TextField
+                                        label="Enter destination"
+                                        variant="filled"
+                                        value={destinationAddress}
+                                        onChange={(e) => setDestinationAddress(e.target.value)}
+                                        sx={{
+                                            width: "100%",
+                                            backgroundColor: "#EDEDED",
+                                            borderRadius: 2,
+                                            "& .MuiFilledInput-underline:before": {
+                                                borderBottom: "none", // Elimina la línea inferior en el estado normal
+                                            },
+                                            "& .MuiFilledInput-underline:after": {
+                                                borderBottom: "none", // Elimina la línea inferior en el estado activo/foco
+                                            },
+                                            "& .MuiFilledInput-underline:hover:before": {
+                                                borderBottom: "none", // Elimina la línea inferior al pasar el ratón por encima
+                                            },
+                                            "& .MuiFilledInput-root": {
+                                                backgroundColor: "rgba(0,0,0,0)", // Hace el fondo transparente
+                                                "&:hover": {
+                                                    backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente al pasar el ratón por encima
+                                                },
+                                                "&.Mui-focused": {
+                                                    backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente en el estado de foco
+                                                },
+                                            },
+                                        }}
+                                    />
+                                </StandaloneSearchBox>
+                                <Card>
+                                    <CardContent>
+                                        <IconButton onClick={handleVerMapsClick}>
+                                            Ver
+                                            <LocationOnOutlined sx={{ color: "red" }} fontSize="small" />
+                                        </IconButton>
+                                        <IconButton onClick={handleShareMapsClick}>
+                                            Share
+                                            <ShareLocationOutlined sx={{ color: "red" }} fontSize="small" />
+                                        </IconButton>
+                                    </CardContent>
+                                </Card>
+                            </>
+
+                        )}
+
+                    </Box>
+                </Draggable>
+
                 <Box
                     sx={{
+                        display: "flex",
+                        flexDirection: "column",
                         justifyContent: "center",
                         alignContent: "center",
                         alignItems: "center",
-                        position: mapVisible ? "fixed" : "absolute",
-                        top: mapVisible ? "40%" : "40%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        zIndex: 2,
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        gap: 2,
-                        width: mapVisible ? "auto" : "100%", // Permite que la caja se ajuste al contenido si el mapa está visible
-                        padding: mapVisible ? 1 : 0,
-                        borderRadius: mapVisible ? 2 : 0,
-                        background: mapVisible ? "#FFFFFF" : "none",
-                    }}
-                >
-                    <StandaloneSearchBox
-                        onLoad={setOriginSearchBox}
-                        onPlacesChanged={onOriginPlacesChanged}
-                    >
-                        <TextField
-                            label="Enter origin"
-                            variant="filled"
-                            sx={{
-                                width: "100%",
-                                backgroundColor: "#EDEDED",
-                                borderRadius: 2,
-                                "& .MuiFilledInput-underline:before": {
-                                    borderBottom: "none", // Elimina la línea inferior en el estado normal
-                                },
-                                "& .MuiFilledInput-underline:after": {
-                                    borderBottom: "none", // Elimina la línea inferior en el estado activo/foco
-                                },
-                                "& .MuiFilledInput-underline:hover:before": {
-                                    borderBottom: "none", // Elimina la línea inferior al pasar el ratón por encima
-                                },
-                                "& .MuiFilledInput-root": {
-                                    backgroundColor: "rgba(0,0,0,0)", // Hace el fondo transparente
-                                    "&:hover": {
-                                        backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente al pasar el ratón por encima
-                                    },
-                                    "&.Mui-focused": {
-                                        backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente en el estado de foco
-                                    },
-                                },
-                            }}
-                            value={originAddress}
-                            onChange={(e) => setOriginAddress(e.target.value)}
-                        />
-                    </StandaloneSearchBox>
-                    <StandaloneSearchBox
-                        onLoad={setDestinationSearchBox}
-                        onPlacesChanged={onDestinationPlacesChanged}
-                    >
-                        <TextField
-                            label="Enter destination"
-                            variant="filled"
-                            value={destinationAddress}
-                            onChange={(e) => setDestinationAddress(e.target.value)}
-                            sx={{
-                                width: "100%",
-                                backgroundColor: "#EDEDED",
-                                borderRadius: 2,
-                                "& .MuiFilledInput-underline:before": {
-                                    borderBottom: "none", // Elimina la línea inferior en el estado normal
-                                },
-                                "& .MuiFilledInput-underline:after": {
-                                    borderBottom: "none", // Elimina la línea inferior en el estado activo/foco
-                                },
-                                "& .MuiFilledInput-underline:hover:before": {
-                                    borderBottom: "none", // Elimina la línea inferior al pasar el ratón por encima
-                                },
-                                "& .MuiFilledInput-root": {
-                                    backgroundColor: "rgba(0,0,0,0)", // Hace el fondo transparente
-                                    "&:hover": {
-                                        backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente al pasar el ratón por encima
-                                    },
-                                    "&.Mui-focused": {
-                                        backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente en el estado de foco
-                                    },
-                                },
-                            }}
-                        />
-                    </StandaloneSearchBox>
-                    <Card>
-                        <CardContent>
-                            <IconButton onClick={handleVerMapsClick}>
-                                Ver
-                                <LocationOnOutlined sx={{ color: "red" }} fontSize="small" />
-                            </IconButton>
-                            <IconButton onClick={handleShareMapsClick}>
-                                Share
-                                <ShareLocationOutlined sx={{ color: "red" }} fontSize="small" />
-                            </IconButton>
-                        </CardContent>
-                    </Card>
-                </Box>
-                <Box
-                    sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        alignContent: "center",
-                        alignItems: "center",
-                        marginTop: "-8%",
+                        marginTop: "-4%",
                     }}
                 >
                     {mapVisible && (
@@ -404,7 +423,14 @@ const TextFieldMaps = () => {
                         </GoogleMap>
                     )}
                 </Box>
-
+                {showAlert && (
+                    <Alert
+                        severity="error"
+                        onClose={() => setShowAlert(false)} // Permite cerrar el alert
+                    >
+                        {alertMessage}
+                    </Alert>
+                )}
                 <SwipeableDrawer
                     anchor={"bottom"}
                     open={open}
@@ -509,14 +535,7 @@ const TextFieldMaps = () => {
                     </StyledBox>
                 </SwipeableDrawer>
             </Box>
-            {showAlert && (
-                <Alert
-                    severity="error"
-                    onClose={() => setShowAlert(false)} // Permite cerrar el alert
-                >
-                    {alertMessage}
-                </Alert>
-            )}
+
         </>
     );
 };
