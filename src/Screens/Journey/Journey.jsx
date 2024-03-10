@@ -32,12 +32,13 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import avatar1 from "../../Assets/images/CabbieX.jpeg";
 import avatar2 from "../../Assets/images/CabbieXL.jpeg";
 import { useNavigate } from "react-router-dom";
-import { Chat } from "@mui/icons-material";
+import { Chat, LocationOnOutlined } from "@mui/icons-material";
 import LocalTaxiIcon from "@mui/icons-material/LocalTaxi";
 import { signOut } from "firebase/auth";
 import { auth } from "../../Data/Database";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { getDatabase, ref as dbRef, set, get } from "firebase/database";
+import TextFieldMaps from "../../widget/TextFieldMaps";
 
 const drawerBleeding = 56;
 
@@ -91,7 +92,6 @@ const Journey = () => {
             const userData = snapshot.val();
             setName(userData.name);
             setPhotoURL(userData.imageUrl);
-
           } else {
             console.log(
               "No se encontraron datos del usuario en la base de datos."
@@ -109,20 +109,24 @@ const Journey = () => {
       // Referencia a todos los usuarios clientes
       const usersRef = dbRef(database, "Users/UsersClient");
 
-      get(usersRef).then((snapshot) => {
-        if (snapshot.exists()) {
-          const usersData = snapshot.val();
-          // Filtrar por usuarios con el rol de "taxista"
-          const taxiUsersFiltered = Object.entries(usersData)
-            .filter(([key, value]) => value.role === "taxista")
-            .map(([key, value]) => ({ uid: key, ...value }));
-          setTaxiUsers(taxiUsersFiltered);
-        } else {
-          console.log("No se encontraron datos de usuarios en la base de datos.");
-        }
-      }).catch((error) => {
-        console.error("Error al obtener datos de los usuarios:", error);
-      });
+      get(usersRef)
+        .then((snapshot) => {
+          if (snapshot.exists()) {
+            const usersData = snapshot.val();
+            // Filtrar por usuarios con el rol de "taxista"
+            const taxiUsersFiltered = Object.entries(usersData)
+              .filter(([key, value]) => value.role === "taxista")
+              .map(([key, value]) => ({ uid: key, ...value }));
+            setTaxiUsers(taxiUsersFiltered);
+          } else {
+            console.log(
+              "No se encontraron datos de usuarios en la base de datos."
+            );
+          }
+        })
+        .catch((error) => {
+          console.error("Error al obtener datos de los usuarios:", error);
+        });
     }
   }, [user, database]);
 
@@ -182,6 +186,27 @@ const Journey = () => {
   const handleOpenDrawer = () => {
     setOpen(true);
   };
+
+  const [taxiLocation, setTaxiLocation] = useState({ lat: null, lng: null });
+
+  const HandleLocation = () => {
+    const taxista = taxiUsers.find(user => user.role === "taxista");
+    console.log(taxista); // Depurar el usuario taxista encontrado
+
+    const taxistaLocation = taxista?.ubication;
+    if (taxistaLocation) {
+      setTaxiLocation(taxistaLocation);
+    } else {
+      console.log("No se encontró la ubicación del taxista");
+    }
+  };
+
+
+  const updateMap = (location) => {
+    console.log(`Actualizando el mapa a la nueva ubicación: ${location.lat}, ${location.lng}`);
+  };
+
+
 
   return (
     <Root>
@@ -282,99 +307,9 @@ const Journey = () => {
         </MenuItem>
       </Menu>
       <Box sx={{ textAlign: "center", pt: 1 }}>
-        <MapsApI />
+        <TextFieldMaps />
       </Box>
-      <SwipeableDrawer
-        container={container}
-        anchor="bottom"
-        open={open}
-        onClose={toggleDrawer(false)}
-        onOpen={toggleDrawer(true)}
-        swipeAreaWidth={drawerBleeding}
-        disableSwipeToOpen={false}
-        ModalProps={{
-          keepMounted: true,
-        }}
-      >
-        <StyledBox
-          sx={{
-            position: "absolute",
-            top: -drawerBleeding,
-            borderTopLeftRadius: 8,
-            borderTopRightRadius: 8,
-            visibility: "visible",
-            right: 0,
-            left: 0,
-            background: "#000",
-            color: "white",
-            justifyContent: "center",
-          }}
-        >
-          <Puller />
 
-          <Typography sx={{ p: 2, color: "white" }}>
-            Taxis disponibles: {taxiUsers.length}
-          </Typography>
-        </StyledBox>
-        <StyledBox
-          sx={{
-            px: 2,
-            pb: 2,
-            height: "100%",
-            overflow: "auto",
-            background: "#E0E0E0",
-            color: "#000",
-          }}
-        >
-          <List sx={{ width: "100%" }}>
-          {taxiUsers.map((taxiUser, index) => (
-              <ListItem
-              key={index}
-                divider
-                sx={{
-                  background: "#fff",
-                  borderRadius: 1,
-                  mb: 1,
-                }}
-              >
-                <ListItemAvatar>
-                  <Avatar
-                    src={taxiUser.imageUrl || ""}
-                    sx={{
-                      color: "black",
-                      Width: "100%",
-                      Height: "100%",
-                      objectFit: "contain",
-                    }}
-                  />
-                </ListItemAvatar>
-                <ListItemText
-                  sx={{ color: "black" }}
-                  primary={taxiUser.name}
-                  secondary={generateRating(taxiUser.rating)}
-                />
-                <ListItemIcon>
-                  <IconButton
-                    edge="end"
-                    onClick={HandleNavegateComponents}
-                    sx={{ color: "black" }}
-                  >
-                    <ChatIcon />
-                  </IconButton>
-
-                  <IconButton
-                    edge="end"
-                    onClick={HandleNavegateCalling}
-                    sx={{ color: "green" }}
-                  >
-                    <PhoneIcon />
-                  </IconButton>
-                </ListItemIcon>
-              </ListItem>
-            ))}
-          </List>
-        </StyledBox>
-      </SwipeableDrawer>
     </Root>
   );
 };

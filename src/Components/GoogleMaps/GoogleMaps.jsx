@@ -4,13 +4,16 @@ import { auth } from "../../Data/Database";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { getDatabase, ref as dbRef, set, get } from "firebase/database";
 
-const MapsAPI = () => {
-  const savedLocation = JSON.parse(localStorage.getItem("location"));
+const MapsAPI = ({ location }) => {
+  //const savedLocation = JSON.parse(localStorage.getItem("location"));
   const savedPhotoURL = localStorage.getItem("photoURL");
-  const [currentLocation, setCurrentLocation] = useState(savedLocation || {
-    lat: null,
-    lng: null,
-  });
+  const [currentLocation, setCurrentLocation] = useState(
+    //savedLocation || 
+    {
+      lat: null,
+      lng: null,
+    }
+  );
   const googleMapsApiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
   const [photoURL, setPhotoURL] = useState(savedPhotoURL || "");
 
@@ -76,8 +79,8 @@ const MapsAPI = () => {
   }, [user, database]);
 
   useEffect(() => {
-
-    if (!savedLocation && navigator.geolocation) {
+    
+    if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const location = {
@@ -86,6 +89,37 @@ const MapsAPI = () => {
           };
           setCurrentLocation(location);
           localStorage.setItem("location", JSON.stringify(location));
+          // Verificar y actualizar la ubicación en la base de datos
+          if (user) {
+            const userRef = dbRef(database, `Users/UsersClient/${user.uid}`);
+            get(userRef).then((snapshot) => {
+              if (snapshot.exists()) {
+                const userData = snapshot.val();
+                // Suponiendo que el rol está disponible en los datos del usuario
+                if (
+                  userData.role === "taxista" ||
+                  userData.role === "usuario"
+                ) {
+                  // Actualiza la ubicación en la base de datos
+                  const updateRef = dbRef(
+                    database,
+                    `Users/UsersClient/${user.uid}`
+                  );
+                  set(updateRef, { ...userData, ubication: location })
+                    .then(() => {
+                      console.log("Ubicación actualizada en la base de datos");
+                    })
+                    .catch((error) => {
+                      console.error("Error al actualizar la ubicación:", error);
+                    });
+                }
+              } else {
+                console.log(
+                  "No se encontraron datos del usuario en la base de datos."
+                );
+              }
+            });
+          }
         },
         (error) => {
           console.error("Error obteniendo la ubicación: ", error);
@@ -94,32 +128,42 @@ const MapsAPI = () => {
         { enableHighAccuracy: true }
       );
     }
-  }, [savedLocation]);
+  }, [user, database]);
 
   useEffect(() => {
     let marker;
-    if (
-      isLoaded &&
-      currentLocation.lat &&
-      currentLocation.lng &&
-      mapRef.current
-    ) {
-      const marker = new window.google.maps.Marker({
-        position: currentLocation,
-        map: mapRef.current,
-        icon: {
-          url: `${photoURL}`, // Asegúrate de reemplazar esto con la ruta real a tu icono personalizado
-          scaledSize: new window.google.maps.Size(80, 80),
-        },
-        anchor: new window.google.maps.Point(40, 40),
-      });
+    if (isLoaded && mapRef.current) {
+      if (location && location.lat && location.lng) {
+        // Si se proporcionó `location` como prop, crea un marcador para la ubicación del taxista
+        marker = new window.google.maps.Marker({
+          position: location,
+          map: mapRef.current,
+          icon: {
+            url: `${photoURL}`, // Asegúrate de reemplazar esto con la ruta real a tu icono personalizado
+            scaledSize: new window.google.maps.Size(80, 80),
+          },
+          anchor: new window.google.maps.Point(40, 40),
+        });
+      } else if (currentLocation.lat && currentLocation.lng) {
+        // Si no se proporcionó `location`, utiliza `currentLocation`
+        marker = new window.google.maps.Marker({
+          position: currentLocation,
+          map: mapRef.current,
+          icon: {
+            url: `${photoURL}`, // Asegúrate de reemplazar esto con la ruta real a tu icono personalizado
+            scaledSize: new window.google.maps.Size(80, 80),
+          },
+          anchor: new window.google.maps.Point(40, 40),
+        });
+      }
 
       return () => {
-        marker.setMap(null); // Limpieza al desmontar el componente
+        if (marker) {
+          marker.setMap(null); // Limpieza al desmontar el componente
+        }
       };
     }
-
-  }, [currentLocation, isLoaded, photoURL]);
+  }, [location, currentLocation, isLoaded, photoURL, mapRef]);
 
   return isLoaded ? (
     <GoogleMap
