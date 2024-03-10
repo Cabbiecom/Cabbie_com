@@ -10,10 +10,7 @@ import {
     ListItemText,
     ListItemIcon,
     Typography,
-    Card,
-    CardContent,
     Alert,
-    Fab,
 } from "@mui/material";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
@@ -22,7 +19,12 @@ import {
     StandaloneSearchBox,
     DirectionsRenderer,
 } from "@react-google-maps/api";
-import { LocationOnOutlined, Minimize, MyLocation, ShareLocationOutlined } from "@mui/icons-material";
+import {
+    LocationOnOutlined,
+    Minimize,
+
+    ShareLocationOutlined,
+} from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import { grey } from "@mui/material/colors";
 import { auth } from "../Data/Database";
@@ -32,7 +34,7 @@ import { useNavigate } from "react-router-dom";
 import StarIcon from "@mui/icons-material/Star";
 import ChatIcon from "@mui/icons-material/Chat";
 import PhoneIcon from "@mui/icons-material/Phone";
-import Draggable from "react-draggable";
+
 
 const libraries = ["places"];
 
@@ -104,7 +106,13 @@ const TextFieldMaps = () => {
 
     // Constatntes de Destino del renderizado
     const [directionsResponse, setDirectionsResponse] = useState(null);
-
+    // Recuperar la ruta almacenada de localStorage al cargar el componente
+    useEffect(() => {
+        const savedRoute = localStorage.getItem("savedRoute");
+        if (savedRoute) {
+            setDirectionsResponse(JSON.parse(savedRoute));
+        }
+    }, []);
     //Constatntes del Alert
     const [showAlert, setShowAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState("");
@@ -207,9 +215,13 @@ const TextFieldMaps = () => {
                 setShowAlert(true);
             }
         } else {
-            // Opcionalmente, aquí puedes manejar la situación para navegadores que no soporten navigator.share
-            setAlertMessage("Compartir no es soportado en este navegador.");
-            setShowAlert(true);
+            if (window.Android && typeof window.Android.share === 'function') {
+                const textToShare = `Mira esta ubicación en el mapa: ${googleMapsRouteUrl}`;
+                window.Android.share(textToShare);
+            } else {
+                setAlertMessage("Compartir no es soportado en este navegador ni en esta aplicación.");
+                setShowAlert(true);
+            }
         }
     };
 
@@ -280,7 +292,7 @@ const TextFieldMaps = () => {
         <>
             <Box
                 sx={{
-                    height: "90vh",
+                    height: "100vh",
                     width: "100%",
                     position: "relative",
                     justifyContent: "center",
@@ -288,8 +300,6 @@ const TextFieldMaps = () => {
                     alignItems: "center",
                 }}
             >
-
-
                 <Box
                     sx={{
                         justifyContent: "center",
@@ -311,51 +321,54 @@ const TextFieldMaps = () => {
                         background: mapVisible ? "#FFFFFF" : "none",
                     }}
                 >
-                    <IconButton onClick={toggleBoxVisibility}
+                    <IconButton
+                        onClick={toggleBoxVisibility}
                         sx={{
-                            alignSelf: 'flex-end',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            textAlign: 'center',
-                            alignContent: 'center'
-                        }}>
+                            alignSelf: "flex-end",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            textAlign: "center",
+                            alignContent: "center",
+                        }}
+                    >
                         <Minimize />
                     </IconButton>
                     {BoxVisible && (
-                        <><StandaloneSearchBox
-                            onLoad={setOriginSearchBox}
-                            onPlacesChanged={onOriginPlacesChanged}
-                        >
-                            <TextField
-                                label="Enter origin"
-                                variant="filled"
-                                sx={{
-                                    width: "100%",
-                                    backgroundColor: "#EDEDED",
-                                    borderRadius: 2,
-                                    "& .MuiFilledInput-underline:before": {
-                                        borderBottom: "none", // Elimina la línea inferior en el estado normal
-                                    },
-                                    "& .MuiFilledInput-underline:after": {
-                                        borderBottom: "none", // Elimina la línea inferior en el estado activo/foco
-                                    },
-                                    "& .MuiFilledInput-underline:hover:before": {
-                                        borderBottom: "none", // Elimina la línea inferior al pasar el ratón por encima
-                                    },
-                                    "& .MuiFilledInput-root": {
-                                        backgroundColor: "rgba(0,0,0,0)", // Hace el fondo transparente
-                                        "&:hover": {
-                                            backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente al pasar el ratón por encima
+                        <>
+                            <StandaloneSearchBox
+                                onLoad={setOriginSearchBox}
+                                onPlacesChanged={onOriginPlacesChanged}
+                            >
+                                <TextField
+                                    label="Enter origin"
+                                    variant="filled"
+                                    sx={{
+                                        width: "100%",
+                                        backgroundColor: "#EDEDED",
+                                        borderRadius: 2,
+                                        "& .MuiFilledInput-underline:before": {
+                                            borderBottom: "none", // Elimina la línea inferior en el estado normal
                                         },
-                                        "&.Mui-focused": {
-                                            backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente en el estado de foco
+                                        "& .MuiFilledInput-underline:after": {
+                                            borderBottom: "none", // Elimina la línea inferior en el estado activo/foco
                                         },
-                                    },
-                                }}
-                                value={originAddress}
-                                onChange={(e) => setOriginAddress(e.target.value)}
-                            />
-                        </StandaloneSearchBox>
+                                        "& .MuiFilledInput-underline:hover:before": {
+                                            borderBottom: "none", // Elimina la línea inferior al pasar el ratón por encima
+                                        },
+                                        "& .MuiFilledInput-root": {
+                                            backgroundColor: "rgba(0,0,0,0)", // Hace el fondo transparente
+                                            "&:hover": {
+                                                backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente al pasar el ratón por encima
+                                            },
+                                            "&.Mui-focused": {
+                                                backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente en el estado de foco
+                                            },
+                                        },
+                                    }}
+                                    value={originAddress}
+                                    onChange={(e) => setOriginAddress(e.target.value)}
+                                />
+                            </StandaloneSearchBox>
                             <StandaloneSearchBox
                                 onLoad={setDestinationSearchBox}
                                 onPlacesChanged={onDestinationPlacesChanged}
@@ -390,24 +403,18 @@ const TextFieldMaps = () => {
                                     }}
                                 />
                             </StandaloneSearchBox>
-                            <Card>
-                                <CardContent>
-                                    <IconButton onClick={handleVerMapsClick}>
-                                        Ver
-                                        <LocationOnOutlined sx={{ color: "red" }} fontSize="small" />
-                                    </IconButton>
-                                    <IconButton onClick={handleShareMapsClick}>
-                                        Share
-                                        <ShareLocationOutlined sx={{ color: "red" }} fontSize="small" />
-                                    </IconButton>
-                                </CardContent>
-                            </Card>
+
+                            <IconButton onClick={handleVerMapsClick}>
+                                Ver
+                                <LocationOnOutlined sx={{ color: "red" }} fontSize="small" />
+                            </IconButton>
+                            <IconButton onClick={handleShareMapsClick}>
+                                Share
+                                <ShareLocationOutlined sx={{ color: "red" }} fontSize="small" />
+                            </IconButton>
                         </>
-
                     )}
-
                 </Box>
-
 
                 <Box
                     sx={{
@@ -416,7 +423,7 @@ const TextFieldMaps = () => {
                         justifyContent: "center",
                         alignContent: "center",
                         alignItems: "center",
-                        marginTop: "-4%",
+                        marginTop: "-1%",
                     }}
                 >
                     {mapVisible && (
@@ -544,7 +551,6 @@ const TextFieldMaps = () => {
                     </StyledBox>
                 </SwipeableDrawer>
             </Box>
-
         </>
     );
 };
