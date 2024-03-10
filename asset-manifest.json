@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/Cabbie_com/static/css/main.c4ec48ea.css",
-    "main.js": "/Cabbie_com/static/js/main.30f3f8a0.js",
+    "main.js": "/Cabbie_com/static/js/main.fa068cc3.js",
     "static/js/453.b7b4383c.chunk.js": "/Cabbie_com/static/js/453.b7b4383c.chunk.js",
     "static/media/Cabbie.png": "/Cabbie_com/static/media/Cabbie.2f1e6742fd67be332cce.png",
     "index.html": "/Cabbie_com/index.html",
     "main.c4ec48ea.css.map": "/Cabbie_com/static/css/main.c4ec48ea.css.map",
-    "main.30f3f8a0.js.map": "/Cabbie_com/static/js/main.30f3f8a0.js.map",
+    "main.fa068cc3.js.map": "/Cabbie_com/static/js/main.fa068cc3.js.map",
     "453.b7b4383c.chunk.js.map": "/Cabbie_com/static/js/453.b7b4383c.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.c4ec48ea.css",
-    "static/js/main.30f3f8a0.js"
+    "static/js/main.fa068cc3.js"
   ]
 }
