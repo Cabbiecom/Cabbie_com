@@ -180,7 +180,7 @@ const SignUp = () => {
                             </Typography>
 
                             <Typography
-                                onClick={() => navigate("/SignIn")}
+                                onClick={() => navigate("/")}
                                 sx={{
                                     display: "flex",
                                     alignItems: "center",
