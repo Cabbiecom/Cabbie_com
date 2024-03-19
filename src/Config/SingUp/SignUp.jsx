@@ -1,18 +1,34 @@
 import React, { useState } from "react";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { getDatabase, ref as dbRef, set } from "firebase/database"
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getDatabase, ref as dbRef, set } from "firebase/database";
 import {
-    Button, TextField, Typography,
-    Box, Avatar, Container, FormControl,
-    InputLabel, Select, MenuItem, IconButton, Alert, Card, CardContent
+    getStorage,
+    ref as storageRef,
+    uploadBytes,
+    getDownloadURL,
+} from "firebase/storage";
+import {
+    Button,
+    TextField,
+    Typography,
+    Box,
+    Avatar,
+    Container,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    IconButton,
+    Alert,
+    Card,
+    CardContent,
+    Toolbar,
+    AppBar,
 } from "@mui/material";
-import PhotoCamera from '@mui/icons-material/PhotoCamera';
-import Snackbar from '@mui/material/Snackbar';
-import { useNavigate } from 'react-router-dom';
+import PhotoCamera from "@mui/icons-material/PhotoCamera";
+import Snackbar from "@mui/material/Snackbar";
+import { useNavigate } from "react-router-dom";
 import { ArrowForwardIosOutlined } from "@mui/icons-material";
-
-
 
 const SignUp = () => {
     const [name, setName] = useState("");
@@ -28,9 +44,8 @@ const SignUp = () => {
     const storage = getStorage();
     const database = getDatabase();
 
-    //Navegation 
+    //Navegation
     const navigate = useNavigate();
-
 
     // Función para abrir el Snackbar con un mensaje
     const handleOpenSnackbar = (message) => {
@@ -39,7 +54,7 @@ const SignUp = () => {
     };
 
     const handleCloseSnackbar = (event, reason) => {
-        if (reason === 'clickaway') {
+        if (reason === "clickaway") {
             return;
         }
         setOpenSnackbar(false);
@@ -47,14 +62,21 @@ const SignUp = () => {
 
     const handleSignUp = async () => {
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const userCredential = await createUserWithEmailAndPassword(
+                auth,
+                email,
+                password
+            );
             const user = userCredential.user;
 
             let imageUrl = "";
 
             // Subir la imagen a Firebase Storage
             if (image) {
-                const imageRef = storageRef(storage, `Users/UsersClient/images/${user.uid}`);
+                const imageRef = storageRef(
+                    storage,
+                    `Users/UsersClient/images/${user.uid}`
+                );
                 await uploadBytes(imageRef, image);
                 imageUrl = await getDownloadURL(imageRef);
 
@@ -67,13 +89,14 @@ const SignUp = () => {
                 name: name,
                 email: email,
                 role: role,
-                imageUrl: imageUrl
+                imageUrl: imageUrl,
             });
 
-            handleOpenSnackbar(`Usuario registrado con éxito, y la imagen fue subida: ${user}`);
+            handleOpenSnackbar(
+                `Usuario registrado con éxito, y la imagen fue subida: ${user}`
+            );
             navigate("/HomeScreen");
         } catch (error) {
-
             handleOpenSnackbar(`Error al registrar el usuario: ${error.message}`);
         }
     };
@@ -87,74 +110,132 @@ const SignUp = () => {
 
     return (
         <>
-            <Container component="main" maxWidth="xs" >
-                <Box sx={{
-                    mt: 4, display: 'flex',
-                    flexDirection: 'column', alignItems: 'center'
-                }}>
-                    <Typography variant="h5">Registro de Usuario</Typography>
-                    <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        label="Nombre"
-                        autoFocus
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                    />
-                    <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        label="Correo Electrónico"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                    <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        label="Contraseña"
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                    <FormControl fullWidth margin="normal">
-                        <InputLabel>Rol</InputLabel>
-                        <Select
-                            value={role}
-                            label="Rol"
-                            onChange={(e) => setRole(e.target.value)}
-                        >
-                            <MenuItem value="taxista">Taxista</MenuItem>
-                            <MenuItem value="usuario">Usuario</MenuItem>
-                        </Select>
-                    </FormControl>
-                    <IconButton color="primary" aria-label="upload picture" component="label" sx={{ mt: 2 }}>
-                        <input hidden accept="image/*" type="file" onChange={handleImageChange} />
-                        <PhotoCamera />
-                    </IconButton>
-                    {preview && (
-                        <Box sx={{ mb: 2 }}>
-                            <Avatar src={preview} sx={{ width: 100, height: 100 }} />
-                        </Box>
-                    )}
-                    <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        sx={{ mt: 3, mb: 2, background: '#000', color: '#fff' }}
-                        onClick={handleSignUp}
-                    >
+            <AppBar
+                position="fixed"
+                sx={{
+                    zIndex: (theme) => theme.zIndex.drawer + 1,
+                    borderRadius: 2,
+                    background: "black",
+                    visibility: "visible",
+                    display: "-moz-initial",
+                    justifyContent: "center",
+                    alignContent: "center",
+                    alignItems: "center",
+                }}
+            >
+                <Toolbar>
+                    <Typography component="h1" variant="h5">
                         Registrarse
-                    </Button>
+                    </Typography>
+                </Toolbar>
+            </AppBar>
+            <Container
+                component="main"
+                maxWidth="xs"
+            >
+                <Box
+                    sx={{
+                        marginTop: 6,
+                        marginBottom: 4,
+                        maxWidth: "100%",
+                        flexGrow: 1,
+                    }}
+                >
+                    <Card
+                        raised
+                        sx={{
+                            background: "#fff",
 
-                    <Card sx={{
-                        alignContent: "center",
-                        alignItems: "center",
-                        textAlign: "center",
-                        justifyContent: "center",
-                    }}>
+                            marginTop: 10,
+                        }}
+                    >
+                        <CardContent
+                            sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                            }}
+                        >
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                label="Nombre"
+                                autoFocus
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                            />
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                label="Correo Electrónico"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                label="Contraseña"
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+                            <FormControl fullWidth margin="normal">
+                                <InputLabel>Rol</InputLabel>
+                                <Select
+                                    value={role}
+                                    label="Rol"
+                                    onChange={(e) => setRole(e.target.value)}
+                                >
+                                    <MenuItem value="taxista">Taxista</MenuItem>
+                                    <MenuItem value="usuario">Usuario</MenuItem>
+                                </Select>
+                            </FormControl>
+                            <IconButton
+                                color="primary"
+                                aria-label="upload picture"
+                                component="label"
+                                sx={{ mt: 2 }}
+                            >
+                                <input
+                                    hidden
+                                    accept="image/*"
+                                    type="file"
+                                    onChange={handleImageChange}
+                                />
+                                <PhotoCamera />
+                            </IconButton>
+                            {preview && (
+                                <Box sx={{ mb: 2 }}>
+                                    <Avatar src={preview} sx={{ width: 100, height: 100 }} />
+                                </Box>
+                            )}
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                sx={{ mt: 3, mb: 2, background: "#000", color: "#fff" }}
+                                onClick={handleSignUp}
+                            >
+                                Registrarse
+                            </Button>
+                        </CardContent>
+                    </Card>
+
+                    <Card
+                        raised
+                        sx={{
+                            background: "#fff",
+                            mx: "auto",
+                            alignContent: "center",
+                            alignItems: "center",
+                            textAlign: "center",
+                            justifyContent: "center",
+                            marginTop: 2,
+                        }}
+                    >
                         <CardContent
                             sx={{
                                 display: "flex",
@@ -185,22 +266,32 @@ const SignUp = () => {
                                     display: "flex",
                                     alignItems: "center",
                                     cursor: "pointer",
-                                    color: '#292929',
+                                    color: "#292929",
                                     alignContent: "center",
-                                    alignItems: "center",
                                     textAlign: "center",
                                     p: 2,
                                 }}
                             >
-                                SignIn <ArrowForwardIosOutlined fontSize="small" sx={{ color: '#292929' }} />
+                                SignIn{" "}
+                                <ArrowForwardIosOutlined
+                                    fontSize="small"
+                                    sx={{ color: "#292929" }}
+                                />
                             </Typography>
-
                         </CardContent>
                     </Card>
                 </Box>
             </Container>
-            <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-                <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+            >
+                <Alert
+                    onClose={handleCloseSnackbar}
+                    severity="success"
+                    sx={{ width: "100%" }}
+                >
                     {snackbarMessage}
                 </Alert>
             </Snackbar>

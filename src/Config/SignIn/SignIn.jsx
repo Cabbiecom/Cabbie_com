@@ -1,27 +1,16 @@
 import React, { useState, useEffect } from "react";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { useNavigate } from "react-router-dom";
 import { getDatabase, ref, get } from "firebase/database";
-import {
-    getAuth,
-    signInWithEmailAndPassword,
-    GoogleAuthProvider,
-    signInWithPopup,
-    signInWithRedirect,
-    getRedirectResult,
-} from "firebase/auth";
-// Importa el ícono de Google si estás usando Material Icons
-import GoogleIcon from "@mui/icons-material/Google";
-import { Navigate } from "react-router-dom";
+import { signInWithEmailAndPassword, getRedirectResult } from "firebase/auth";
 import { auth } from "../../Data/Database";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
-import { Card, CardContent, Divider, IconButton, } from "@mui/material";
+import { AppBar, Card, CardContent, Toolbar } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
 const SignIn = () => {
@@ -58,9 +47,15 @@ const SignIn = () => {
             const userRef = ref(db, `Users/UsersClient/${uid}`);
             const snapshot = await get(userRef);
             if (snapshot.exists()) {
-                console.log(snapshot.val());
-                // Aquí puedes hacer algo con los datos del usuario
-                navigate("/HomeScreen"); // Redirige al usuario después de iniciar sesión y obtener datos
+                const userRole = snapshot.val().role;
+                if (userRole === "taxista") {
+                    navigate("/HomeTaxista");
+                } else if (userRole === "usuario") {
+                    navigate("/HomeScreen");
+                } else {
+                    // Si el rol no es ni 'taxista' ni 'usuario', maneja el caso (por ejemplo, mostrando una alerta)
+                    showAlert("Rol de usuario no reconocido.", "warning");
+                }
             } else {
                 showAlert("No se encontraron datos de usuario.", "warning");
             }
@@ -81,94 +76,60 @@ const SignIn = () => {
                 }
             })
             .catch((error) => {
-                showAlert(`Error al obtener el resultado de la redirección: ${error.message}`);
+                showAlert(
+                    `Error al obtener el resultado de la redirección: ${error.message}`
+                );
             });
-    }, []);
-
+    }, [navigate]);
 
     return (
-        <Container component="main" maxWidth="xs" >
-            <Box
+        <>
+            <AppBar
+                position="fixed"
                 sx={{
-                    marginTop: 8,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
+                    zIndex: (theme) => theme.zIndex.drawer + 1,
+                    borderRadius: 2,
+                    background: "black",
+                    visibility: "visible",
+                    display: "-moz-initial",
+                    justifyContent: 'center',
+                    alignContent: 'center',
+                    alignItems: 'center'
                 }}
             >
-                <Card >
-                    <CardContent
-                        sx={{
-                            alignContent: "center",
-                            alignItems: "center",
-                            textAlign: "center",
-                            justifyContent: "space-around",
-                            p: 2,
-                        }}
-                    >
-                        <Typography component="h1" variant="h5">
-                            Iniciar sesión
-                        </Typography>
-                        <Box component="form" noValidate sx={{ mt: 1 }}>
-                            <TextField
-                                margin="normal"
-                                required
-                                fullWidth
-                                id="email"
-                                label="Correo electrónico"
-                                name="email"
-                                autoComplete="email"
-                                autoFocus
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
-                            <TextField
-                                margin="normal"
-                                required
-                                fullWidth
-                                name="password"
-                                label="Contraseña"
-                                type="password"
-                                id="password"
-                                autoComplete="current-password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                            <Button
-                                type="submit"
-                                fullWidth
-                                variant="contained"
-                                onClick={handleLogin}
-                                sx={{ mt: 3, mb: 2, background: "#000" }}
-                            >
-                                Iniciar sesión
-                            </Button>
-                        </Box>
-                    </CardContent>
-                </Card>
-
+                <Toolbar>
+                    <Typography component="h1" variant="h5">
+                        Iniciar sesión
+                    </Typography>
+                </Toolbar>
+            </AppBar>
+            <Container
+                component="main"
+                maxWidth="xs"
+                sx={{
+                    overflowY: "auto",
+                    padding: "10px",
+                    marginTop: 10,
+                    marginBottom: 4,
+                    maxWidth: "100%",
+                    flexGrow: 1,
+                }}
+            >
                 <Box
                     sx={{
-                        marginTop: 2,
                         display: "flex",
                         flexDirection: "column",
-                        alignItems: "center",
-                        textAlign: "center",
-                        justifyContent: "center",
                     }}
                 >
                     <Card
+                        raised
                         sx={{
-                            alignContent: "center",
-                            alignItems: "center",
-                            textAlign: "center",
-                            justifyContent: "center",
+                            background: "#fff",
+                            mx: "auto"
                         }}
                     >
                         <CardContent
                             sx={{
-                                display: "flex",
-
                                 alignContent: "center",
                                 alignItems: "center",
                                 textAlign: "center",
@@ -176,53 +137,127 @@ const SignIn = () => {
                                 p: 2,
                             }}
                         >
-                            <Typography
-                                component="p"
-                                variant="body1"
-                                sx={{
-                                    display: "flex",
-                                    alignContent: "center",
-                                    alignItems: "center",
-                                    textAlign: "center",
-                                }}
-                            >
-                                No tinenes una cuenta?
-                            </Typography>
 
-                            <Typography
-                                onClick={() => navigate("/SignUp")}
+                            <Box component="form" noValidate sx={{ mt: 1 }}>
+                                <TextField
+                                    margin="normal"
+                                    required
+                                    fullWidth
+                                    id="email"
+                                    label="Correo electrónico"
+                                    name="email"
+                                    autoComplete="email"
+                                    autoFocus
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
+                                <TextField
+                                    margin="normal"
+                                    required
+                                    fullWidth
+                                    name="password"
+                                    label="Contraseña"
+                                    type="password"
+                                    id="password"
+                                    autoComplete="current-password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                />
+                                <Button
+                                    type="submit"
+                                    fullWidth
+                                    variant="contained"
+                                    onClick={handleLogin}
+                                    sx={{ mt: 3, mb: 2, background: "#000" }}
+                                >
+                                    Iniciar sesión
+                                </Button>
+                            </Box>
+                        </CardContent>
+                    </Card>
+
+                    <Box
+                        sx={{
+                            marginTop: 2,
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            textAlign: "center",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <Card
+                            raised
+                            sx={{
+                                background: "#fff",
+                                mx: "auto",
+                                alignContent: "center",
+                                alignItems: "center",
+                                textAlign: "center",
+                                justifyContent: "center",
+                            }}
+                        >
+                            <CardContent
                                 sx={{
                                     display: "flex",
-                                    alignItems: "center",
-                                    cursor: "pointer",
-                                    color: '#292929',
+
                                     alignContent: "center",
                                     alignItems: "center",
                                     textAlign: "center",
+                                    justifyContent: "space-around",
                                     p: 2,
                                 }}
                             >
-                                SignUp <ArrowForwardIosIcon fontSize="small" sx={{ color: '#292929' }} />
-                            </Typography>
+                                <Typography
+                                    component="p"
+                                    variant="body1"
+                                    sx={{
+                                        display: "flex",
+                                        alignContent: "center",
+                                        alignItems: "center",
+                                        textAlign: "center",
+                                    }}
+                                >
+                                    No tinenes una cuenta?
+                                </Typography>
 
-                        </CardContent>
-                    </Card>
-                </Box>
-                <Snackbar
-                    open={openAlert}
-                    autoHideDuration={6000}
-                    onClose={handleCloseAlert}
-                >
-                    <Alert
+                                <Typography
+                                    onClick={() => navigate("/SignUp")}
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        cursor: "pointer",
+                                        color: "#292929",
+                                        alignContent: "center",
+                                        textAlign: "center",
+                                        p: 2,
+                                    }}
+                                >
+                                    SignUp{" "}
+                                    <ArrowForwardIosIcon
+                                        fontSize="small"
+                                        sx={{ color: "#292929" }}
+                                    />
+                                </Typography>
+                            </CardContent>
+                        </Card>
+                    </Box>
+                    <Snackbar
+                        open={openAlert}
+                        autoHideDuration={6000}
                         onClose={handleCloseAlert}
-                        severity={alertSeverity}
-                        sx={{ width: "100%" }}
                     >
-                        {alertMessage}
-                    </Alert>
-                </Snackbar>
-            </Box>
-        </Container>
+                        <Alert
+                            onClose={handleCloseAlert}
+                            severity={alertSeverity}
+                            sx={{ width: "100%" }}
+                        >
+                            {alertMessage}
+                        </Alert>
+                    </Snackbar>
+                </Box>
+            </Container>
+        </>
     );
 };
 

@@ -2,16 +2,21 @@ import React, { useEffect, useState } from "react";
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
 //import logo from "./Assets/images/Cabbie.png";
 import "./App.css";
-import HomeScreen from "./Screens/Home/HomeScreen";
+import HomeScreen from "./Screens/Cliente/Home/HomeScreen";
 //import Navbar from "./Components/Navbar/Navbar";
-import Journey from "./Screens/Journey/Journey";
-import Profile from "./Screens/Profile/Profile";
+import Journey from "./Screens/Cliente/Journey/Journey";
+import Profile from "./Screens/Cliente/Profile/Profile";
 import ConversationMessage from "./Components/Chat/ConversationMessage.jsx/ConversationMessage";
 import CallMessageConversationMessage from "./Components/Call/CallMessageConversationMessage";
 import ChatMessage from "./Components/Chat/ChatMessage/ChatMessage";
 import EditProfile from "./Components/EditProfile/EditProfile";
 import SignIn from "./Config/SignIn/SignIn";
 import SignUp from "./Config/SingUp/SignUp";
+import HomeTaxista from "./Screens/taxista/HomeTaxista";
+import TaxiChatComponent from "./Screens/taxista/Chat/ChatTaxista/TaxiChatComponent";
+import ChatList from "./Screens/taxista/Chat/ChatList/ChatList";
+import ChatConversationClient from "./Screens/taxista/Chat/ChatConversation/ChatConversationClient";
+ 
 
 // Componente SplashScreen
 //const SplashScreen = () => (
@@ -39,6 +44,7 @@ function App() {
       <Routes>
         <Route path="/" exact element={<SignIn />} />
         <Route path="/HomeScreen" element={<HomeScreen />} />
+        <Route path="/HomeTaxista" element={<HomeTaxista />} />
         <Route path="/Journey" element={<Journey />} />
         <Route path="/Profile" element={<Profile />} />
         <Route path="/ConversationMessage" element={<ConversationMessage />} />
@@ -48,7 +54,11 @@ function App() {
           path="/CallMessageConversationMessage"
           element={<CallMessageConversationMessage />}
         />
+ 
+        <Route path="/ChatList" element={<ChatList />} />
         <Route path="/ChatMessage" element={<ChatMessage />} />
+        <Route path="chat/:UsuarioId" element={<ChatConversationClient /> } />
+        <Route path="/chat/:chatId" element={<TaxiChatComponent />} />
       </Routes>
     </Router>
   );

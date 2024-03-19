@@ -11,6 +11,9 @@ import {
     ListItemIcon,
     Typography,
     Alert,
+    Card,
+    CardContent,
+    Button,
 } from "@mui/material";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
@@ -18,11 +21,11 @@ import {
     GoogleMap,
     StandaloneSearchBox,
     DirectionsRenderer,
+    Marker,
 } from "@react-google-maps/api";
 import {
     LocationOnOutlined,
     Minimize,
-
     ShareLocationOutlined,
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
@@ -34,7 +37,6 @@ import { useNavigate } from "react-router-dom";
 import StarIcon from "@mui/icons-material/Star";
 import ChatIcon from "@mui/icons-material/Chat";
 import PhoneIcon from "@mui/icons-material/Phone";
-
 
 const libraries = ["places"];
 
@@ -91,6 +93,7 @@ const TextFieldMaps = () => {
 
     // Constantes para la Conexión Taxista
     const [taxiUsers, setTaxiUsers] = useState([]);
+    const [selectedTaxiUserIndex, setSelectedTaxiUserIndex] = useState(null);
     const [user, loading, error] = useAuthState(auth);
 
     // Constantes de las Acciones del Drawer
@@ -174,8 +177,17 @@ const TextFieldMaps = () => {
         setOpen(open);
     };
 
-    const HandleNavegateComponents = () => {
-        navigate("/ConversationMessage");
+    const HandleNavegateComponents = (taxiUserId) => {
+        if (originAddress && destinationAddress) {
+            navigate(`/chat/${taxiUserId}`, {
+                state: {
+                    originAddress,
+                    destinationAddress,
+                },
+            });
+        } else {
+            console.error("Origen o destino no especificado.");
+        }
     };
 
     const HandleNavegateCalling = () => {
@@ -188,7 +200,40 @@ const TextFieldMaps = () => {
         setOpen(true);
     };
 
-    //
+    //Seleccionar Taxista
+    const selectTaxiUser = (index) => {
+        setSelectedTaxiUserIndex(index);
+    };
+
+    // Función para enviar parámetros de ubicación al chat del taxista seleccionado
+    const handleSelectCabbie = () => {
+        if (selectedTaxiUserIndex !== null) {
+            const selectedTaxiUser = taxiUsers[selectedTaxiUserIndex];
+            if (selectedTaxiUser) {
+                HandleNavegateComponents(selectedTaxiUser.uid);
+            } else {
+                console.error("Taxista seleccionado no válido.");
+            }
+        } else {
+            console.error("No se ha seleccionado ningún taxista.");
+        }
+    };
+    // Función para obtener la ubicación del taxista seleccionado
+    const HandleLocationCabbie = () => {
+        if (selectedTaxiUserIndex !== null) {
+            const selectedTaxiUser = taxiUsers[selectedTaxiUserIndex];
+            const taxistaLocation = selectedTaxiUser?.location;
+            if (taxistaLocation) {
+                setTaxiLocation(taxistaLocation);
+            } else {
+                console.log("No se encontró la ubicación del taxista seleccionado");
+            }
+        } else {
+            console.error("No se ha seleccionado ningún taxista.");
+        }
+    };
+
+    //Compartir mapa
     const handleShareMapsClick = async () => {
         if (originAddress === "" || destinationAddress === "") {
             setAlertMessage("Origen o destino no especificado.");
@@ -215,11 +260,13 @@ const TextFieldMaps = () => {
                 setShowAlert(true);
             }
         } else {
-            if (window.Android && typeof window.Android.share === 'function') {
+            if (window.Android && typeof window.Android.share === "function") {
                 const textToShare = `Mira esta ubicación en el mapa: ${googleMapsRouteUrl}`;
                 window.Android.share(textToShare);
             } else {
-                setAlertMessage("Compartir no es soportado en este navegador ni en esta aplicación.");
+                setAlertMessage(
+                    "Compartir no es soportado en este navegador ni en esta aplicación."
+                );
                 setShowAlert(true);
             }
         }
@@ -237,6 +284,88 @@ const TextFieldMaps = () => {
             console.log("No se encontró la ubicación del taxista");
         }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const capturarUbicacionTaxista = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const ubicacion = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                    };
+                    // Actualiza la ubicación en Firebase
+                    actualizarUbicacionTaxistaEnFirebase(ubicacion);
+                },
+                (error) => {
+                    console.error("Error al obtener la ubicación", error);
+                }
+            );
+        } else {
+            console.error("La Geolocalización no está soportada por este navegador.");
+        }
+    };
+    const actualizarUbicacionTaxistaEnFirebase = (ubicacion) => {
+        if (user) {
+            // Asume que 'user' contiene la información del usuario autenticado
+            const uidTaxista = user.uid;
+            const database = getDatabase();
+            const taxistaRef = dbRef(
+                database,
+                `Users/UsersClient/${uidTaxista}/ubicacion`
+            );
+
+            set(taxistaRef, ubicacion)
+                .then(() => {
+                    console.log("Ubicación actualizada con éxito.");
+                })
+                .catch((error) => {
+                    console.error("Error al actualizar la ubicación", error);
+                });
+        }
+    };
+
+    //Taxi Ubication
+    const esUbicacionValida = (lat, lng) => {
+        return (
+            !isNaN(lat) &&
+            !isNaN(lng) &&
+            lat !== null &&
+            lng !== null &&
+            lat !== undefined &&
+            lng !== undefined
+        );
+    };
+
+    useEffect(() => {
+        const database = getDatabase();
+        const usersRef = dbRef(database, `Users/UsersClient`);
+
+        get(usersRef)
+            .then((snapshot) => {
+                if (snapshot.exists()) {
+                    const usersData = snapshot.val();
+                    const taxiUsersWithLocation = Object.values(usersData)
+                        .filter(
+                            (user) =>
+                                user.role === "taxista" &&
+                                user.ubicacion &&
+                                esUbicacionValida(user.ubicacion.lat, user.ubicacion.lng)
+                        )
+                        .map((user) => ({
+                            ...user,
+                            location: {
+                                lat: Number(user.ubicacion.lat),
+                                lng: Number(user.ubicacion.lng),
+                            },
+                        }));
+
+                    setTaxiUsers(taxiUsersWithLocation);
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching users:", error);
+            });
+    }, []);
 
     //Generador de rating
     const generateRating = (rating) => {
@@ -250,6 +379,11 @@ const TextFieldMaps = () => {
     };
 
     useEffect(() => {
+        capturarUbicacionTaxista();
+        // Otros efectos o inicializaciones aquí
+    }, [capturarUbicacionTaxista]); // La lista de dependencias vacía asegura que esto se ejecute una vez al montar el componente
+
+    useEffect(() => {
         if (user && database) {
             // Referencia a todos los usuarios clientes
             const usersRef = dbRef(database, "Users/UsersClient");
@@ -261,7 +395,11 @@ const TextFieldMaps = () => {
                         // Filtrar por usuarios con el rol de "taxista"
                         const taxiUsersFiltered = Object.entries(usersData)
                             .filter(([key, value]) => value.role === "taxista")
-                            .map(([key, value]) => ({ uid: key, ...value }));
+                            .map(([key, value]) => ({
+                                uid: key,
+                                ...value,
+                                location: { lat: value.lat, lng: value.lng },
+                            }));
                         setTaxiUsers(taxiUsersFiltered);
                     } else {
                         console.log(
@@ -312,7 +450,6 @@ const TextFieldMaps = () => {
                         zIndex: 2,
                         display: "flex",
                         flexDirection: "column",
-                        alignItems: "center",
                         gap: 2,
                         width: BoxVisible ? "auto" : "auto",
 
@@ -436,6 +573,35 @@ const TextFieldMaps = () => {
                             {directionsResponse && (
                                 <DirectionsRenderer directions={directionsResponse} />
                             )}
+                            {taxiUsers.map((taxiUser, index) => {
+                                // Asegúrate de que lat y lng son números válidos antes de usarlos
+                                const lat = parseFloat(taxiUser.location?.lat);
+                                const lng = parseFloat(taxiUser.location?.lng);
+                                if (esUbicacionValida(lat, lng)) {
+                                    // Crear el marcador utilizando AdvancedMarkerElement
+                                    return (
+                                        <Marker
+                                            key={index}
+                                            position={{
+                                                lat: taxiUser.location.lat,
+                                                lng: taxiUser.location.lng,
+                                            }}
+                                            title={taxiUser.name}
+                                            icon={{
+                                                url: taxiUser.imageUrl,
+                                                scaledSize: new window.google.maps.Size(50, 50),
+                                            }}
+                                        />
+                                    );
+                                } else {
+                                    // Opcional: manejar el caso en el que los datos de ubicación no son válidos
+                                    console.error(
+                                        "Datos de ubicación inválidos para",
+                                        taxiUser.name
+                                    );
+                                    return null;
+                                }
+                            })}
                         </GoogleMap>
                     )}
                 </Box>
@@ -495,10 +661,12 @@ const TextFieldMaps = () => {
                                     key={index}
                                     divider
                                     sx={{
-                                        background: "#fff",
+                                        background: selectedTaxiUserIndex === index ? "#808080" : "#fff",
                                         borderRadius: 1,
                                         mb: 1,
+                                        cursor: "pointer",
                                     }}
+                                    onClick={() => selectTaxiUser(index)}
                                 >
                                     <ListItemAvatar>
                                         <Avatar
@@ -548,6 +716,17 @@ const TextFieldMaps = () => {
                                 </ListItem>
                             ))}
                         </List>
+
+                        <Button
+                            onClick={handleSelectCabbie}
+                            sx={{
+                                color: "#fff",
+                                width: "100%",
+                                background: "black",
+                            }}
+                        >
+                            Seleccionar Cabbie
+                        </Button>
                     </StyledBox>
                 </SwipeableDrawer>
             </Box>

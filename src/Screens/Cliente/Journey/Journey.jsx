@@ -21,10 +21,10 @@ import { useNavigate } from "react-router-dom";
 import { Chat } from "@mui/icons-material";
 import LocalTaxiIcon from "@mui/icons-material/LocalTaxi";
 import { signOut } from "firebase/auth";
-import { auth } from "../../Data/Database";
+import { auth } from "../../../Data/Database";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { getDatabase, ref as dbRef, set, get } from "firebase/database";
-import TextFieldMaps from "../../widget/TextFieldMaps";
+import TextFieldMaps from "../../../widget/TextFieldMaps";
 
 const drawerBleeding = 56;
 
@@ -215,7 +215,7 @@ const Journey = () => {
             aria-label="menu"
             onClick={handleClick}
           >
-            <MenuIcon />
+            <Avatar src={photoURL} />
           </IconButton>
         </Toolbar>
       </AppBar>
@@ -266,7 +266,7 @@ const Journey = () => {
         </MenuItem>
         <MenuItem
           onClick={() => {
-            navigate("/ChatMessage");
+            navigate("/ChatList");
           }}
         >
           <ListItemIcon>
