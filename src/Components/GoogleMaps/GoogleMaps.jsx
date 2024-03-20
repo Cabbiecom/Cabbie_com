@@ -19,7 +19,7 @@ const MapsAPI = ({ location }) => {
 
   const [taxiUsers, setTaxiUsers] = useState([]);
   const [user, loading, error] = useAuthState(auth);
-  const mapContainerStyle = { height: "500px", width: "100%" };
+  const mapContainerStyle = { height: "100vh", width: "100%" };
   const mapRef = useRef(null);
   const database = getDatabase();
 
@@ -79,7 +79,7 @@ const MapsAPI = ({ location }) => {
   }, [user, database]);
 
   useEffect(() => {
-    
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -164,6 +164,14 @@ const MapsAPI = ({ location }) => {
       };
     }
   }, [location, currentLocation, isLoaded, photoURL, mapRef]);
+
+  if (!isLoaded) {
+    return <div>Loading...</div>
+  };
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
 
   return isLoaded ? (
     <GoogleMap

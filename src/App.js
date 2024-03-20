@@ -16,7 +16,6 @@ import HomeTaxista from "./Screens/taxista/HomeTaxista";
 import TaxiChatComponent from "./Screens/taxista/Chat/ChatTaxista/TaxiChatComponent";
 import ChatList from "./Screens/taxista/Chat/ChatList/ChatList";
 import ChatConversationClient from "./Screens/taxista/Chat/ChatConversation/ChatConversationClient";
- 
 
 // Componente SplashScreen
 //const SplashScreen = () => (
@@ -54,10 +53,10 @@ function App() {
           path="/CallMessageConversationMessage"
           element={<CallMessageConversationMessage />}
         />
- 
+
         <Route path="/ChatList" element={<ChatList />} />
         <Route path="/ChatMessage" element={<ChatMessage />} />
-        <Route path="chat/:UsuarioId" element={<ChatConversationClient /> } />
+        <Route path="chat/:UsuarioId" element={<ChatConversationClient />} />
         <Route path="/chat/:chatId" element={<TaxiChatComponent />} />
       </Routes>
     </Router>

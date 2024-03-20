@@ -164,6 +164,30 @@ const SignUp = () => {
                                 autoFocus
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
+                                variant="filled"
+                                sx={{
+                                    width: "100%",
+                                    backgroundColor: "#EDEDED",
+                                    borderRadius: 2,
+                                    "& .MuiFilledInput-underline:before": {
+                                        borderBottom: "none", // Elimina la línea inferior en el estado normal
+                                    },
+                                    "& .MuiFilledInput-underline:after": {
+                                        borderBottom: "none", // Elimina la línea inferior en el estado activo/foco
+                                    },
+                                    "& .MuiFilledInput-underline:hover:before": {
+                                        borderBottom: "none", // Elimina la línea inferior al pasar el ratón por encima
+                                    },
+                                    "& .MuiFilledInput-root": {
+                                        backgroundColor: "rgba(0,0,0,0)", // Hace el fondo transparente
+                                        "&:hover": {
+                                            backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente al pasar el ratón por encima
+                                        },
+                                        "&.Mui-focused": {
+                                            backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente en el estado de foco
+                                        },
+                                    },
+                                }}
                             />
                             <TextField
                                 margin="normal"
@@ -172,6 +196,30 @@ const SignUp = () => {
                                 label="Correo Electrónico"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                variant="filled"
+                                sx={{
+                                    width: "100%",
+                                    backgroundColor: "#EDEDED",
+                                    borderRadius: 2,
+                                    "& .MuiFilledInput-underline:before": {
+                                        borderBottom: "none", // Elimina la línea inferior en el estado normal
+                                    },
+                                    "& .MuiFilledInput-underline:after": {
+                                        borderBottom: "none", // Elimina la línea inferior en el estado activo/foco
+                                    },
+                                    "& .MuiFilledInput-underline:hover:before": {
+                                        borderBottom: "none", // Elimina la línea inferior al pasar el ratón por encima
+                                    },
+                                    "& .MuiFilledInput-root": {
+                                        backgroundColor: "rgba(0,0,0,0)", // Hace el fondo transparente
+                                        "&:hover": {
+                                            backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente al pasar el ratón por encima
+                                        },
+                                        "&.Mui-focused": {
+                                            backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente en el estado de foco
+                                        },
+                                    },
+                                }}
                             />
                             <TextField
                                 margin="normal"
@@ -181,6 +229,30 @@ const SignUp = () => {
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                                variant="filled"
+                                sx={{
+                                    width: "100%",
+                                    backgroundColor: "#EDEDED",
+                                    borderRadius: 2,
+                                    "& .MuiFilledInput-underline:before": {
+                                        borderBottom: "none", // Elimina la línea inferior en el estado normal
+                                    },
+                                    "& .MuiFilledInput-underline:after": {
+                                        borderBottom: "none", // Elimina la línea inferior en el estado activo/foco
+                                    },
+                                    "& .MuiFilledInput-underline:hover:before": {
+                                        borderBottom: "none", // Elimina la línea inferior al pasar el ratón por encima
+                                    },
+                                    "& .MuiFilledInput-root": {
+                                        backgroundColor: "rgba(0,0,0,0)", // Hace el fondo transparente
+                                        "&:hover": {
+                                            backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente al pasar el ratón por encima
+                                        },
+                                        "&.Mui-focused": {
+                                            backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente en el estado de foco
+                                        },
+                                    },
+                                }}
                             />
                             <FormControl fullWidth margin="normal">
                                 <InputLabel>Rol</InputLabel>
@@ -188,6 +260,30 @@ const SignUp = () => {
                                     value={role}
                                     label="Rol"
                                     onChange={(e) => setRole(e.target.value)}
+                                    variant="filled"
+                                    sx={{
+                                        width: "100%",
+                                        backgroundColor: "#EDEDED",
+                                        borderRadius: 2,
+                                        "& .MuiFilledInput-underline:before": {
+                                            borderBottom: "none", // Elimina la línea inferior en el estado normal
+                                        },
+                                        "& .MuiFilledInput-underline:after": {
+                                            borderBottom: "none", // Elimina la línea inferior en el estado activo/foco
+                                        },
+                                        "& .MuiFilledInput-underline:hover:before": {
+                                            borderBottom: "none", // Elimina la línea inferior al pasar el ratón por encima
+                                        },
+                                        "& .MuiFilledInput-root": {
+                                            backgroundColor: "rgba(0,0,0,0)", // Hace el fondo transparente
+                                            "&:hover": {
+                                                backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente al pasar el ratón por encima
+                                            },
+                                            "&.Mui-focused": {
+                                                backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente en el estado de foco
+                                            },
+                                        },
+                                    }}
                                 >
                                     <MenuItem value="taxista">Taxista</MenuItem>
                                     <MenuItem value="usuario">Usuario</MenuItem>

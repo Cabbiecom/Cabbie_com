@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { useNavigate } from "react-router-dom";
 import { getDatabase, ref, get } from "firebase/database";
-import { signInWithEmailAndPassword, getRedirectResult } from "firebase/auth";
+import { signInWithEmailAndPassword, getRedirectResult, getAuth } from "firebase/auth";
 import { auth } from "../../Data/Database";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
@@ -34,6 +34,8 @@ const SignIn = () => {
     };
 
     const handleLogin = async (event) => {
+        //ELauth
+        const auth = getAuth();
         event.preventDefault();
         try {
             const userCredential = await signInWithEmailAndPassword(
@@ -41,6 +43,7 @@ const SignIn = () => {
                 email,
                 password
             );
+
             // Usuario autenticado correctamente, obtener datos adicionales de Realtime Database
             const uid = userCredential.user.uid;
             const db = getDatabase();
@@ -60,6 +63,7 @@ const SignIn = () => {
                 showAlert("No se encontraron datos de usuario.", "warning");
             }
         } catch (error) {
+            console.error("Error en el inicio de sesión:", error);
             showAlert(`Error en el inicio de sesión: ${error.message}`, "error");
         }
     };
@@ -92,9 +96,9 @@ const SignIn = () => {
                     background: "black",
                     visibility: "visible",
                     display: "-moz-initial",
-                    justifyContent: 'center',
-                    alignContent: 'center',
-                    alignItems: 'center'
+                    justifyContent: "center",
+                    alignContent: "center",
+                    alignItems: "center",
                 }}
             >
                 <Toolbar>
@@ -113,19 +117,23 @@ const SignIn = () => {
                     marginBottom: 4,
                     maxWidth: "100%",
                     flexGrow: 1,
+                    height:'80vh',
+                    
                 }}
             >
                 <Box
                     sx={{
                         display: "flex",
                         flexDirection: "column",
+                        height:'100%',
+                        justifyContent:'center'
                     }}
                 >
                     <Card
                         raised
                         sx={{
                             background: "#fff",
-                            mx: "auto"
+                            mx: "auto",
                         }}
                     >
                         <CardContent
@@ -137,9 +145,9 @@ const SignIn = () => {
                                 p: 2,
                             }}
                         >
-
                             <Box component="form" noValidate sx={{ mt: 1 }}>
                                 <TextField
+                                    variant="filled"
                                     margin="normal"
                                     required
                                     fullWidth
@@ -150,8 +158,32 @@ const SignIn = () => {
                                     autoFocus
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
+                                    sx={{
+                                        width: "100%",
+                                        backgroundColor: "#EDEDED",
+                                        borderRadius: 2,
+                                        "& .MuiFilledInput-underline:before": {
+                                            borderBottom: "none", // Elimina la línea inferior en el estado normal
+                                        },
+                                        "& .MuiFilledInput-underline:after": {
+                                            borderBottom: "none", // Elimina la línea inferior en el estado activo/foco
+                                        },
+                                        "& .MuiFilledInput-underline:hover:before": {
+                                            borderBottom: "none", // Elimina la línea inferior al pasar el ratón por encima
+                                        },
+                                        "& .MuiFilledInput-root": {
+                                            backgroundColor: "rgba(0,0,0,0)", // Hace el fondo transparente
+                                            "&:hover": {
+                                                backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente al pasar el ratón por encima
+                                            },
+                                            "&.Mui-focused": {
+                                                backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente en el estado de foco
+                                            },
+                                        },
+                                    }}
                                 />
                                 <TextField
+                                    variant="filled"
                                     margin="normal"
                                     required
                                     fullWidth
@@ -162,6 +194,29 @@ const SignIn = () => {
                                     autoComplete="current-password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
+                                    sx={{
+                                        width: "100%",
+                                        backgroundColor: "#EDEDED",
+                                        borderRadius: 2,
+                                        "& .MuiFilledInput-underline:before": {
+                                            borderBottom: "none", // Elimina la línea inferior en el estado normal
+                                        },
+                                        "& .MuiFilledInput-underline:after": {
+                                            borderBottom: "none", // Elimina la línea inferior en el estado activo/foco
+                                        },
+                                        "& .MuiFilledInput-underline:hover:before": {
+                                            borderBottom: "none", // Elimina la línea inferior al pasar el ratón por encima
+                                        },
+                                        "& .MuiFilledInput-root": {
+                                            backgroundColor: "rgba(0,0,0,0)", // Hace el fondo transparente
+                                            "&:hover": {
+                                                backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente al pasar el ratón por encima
+                                            },
+                                            "&.Mui-focused": {
+                                                backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente en el estado de foco
+                                            },
+                                        },
+                                    }}
                                 />
                                 <Button
                                     type="submit"

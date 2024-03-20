@@ -32,11 +32,13 @@ import { styled } from "@mui/material/styles";
 import { grey } from "@mui/material/colors";
 import { auth } from "../Data/Database";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { getDatabase, ref as dbRef, set, get } from "firebase/database";
+import { getDatabase, ref as dbRef, set, get, onValue, query, ref, orderByChild, equalTo } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import StarIcon from "@mui/icons-material/Star";
 import ChatIcon from "@mui/icons-material/Chat";
 import PhoneIcon from "@mui/icons-material/Phone";
+import useFetchTaxiUsers from "./useFetchTaxiUsers";
+import logo from '../Assets/images/CabbieXL.jpeg';
 
 const libraries = ["places"];
 
@@ -58,18 +60,12 @@ const Puller = () => (
         }}
     />
 );
-const Root = styled("div")(({ theme }) => ({
-    height: "100%",
-    backgroundColor:
-        theme.palette.mode === "light"
-            ? grey[100]
-            : theme.palette.background.default,
-}));
+
 
 // Estilos del mapa
 const mapContainerStyle = {
     width: "100%",
-    height: "80vh",
+    height: "100vh",
 };
 
 const center = {
@@ -86,7 +82,7 @@ const TextFieldMaps = () => {
 
     // Localizar taxista
     const [taxiLocation, setTaxiLocation] = useState({ lat: null, lng: null });
-
+    const taxiUsersFetch = useFetchTaxiUsers();
     // Acceso a la base de datos
     const navigate = useNavigate();
     const database = getDatabase();
@@ -219,19 +215,7 @@ const TextFieldMaps = () => {
         }
     };
     // Función para obtener la ubicación del taxista seleccionado
-    const HandleLocationCabbie = () => {
-        if (selectedTaxiUserIndex !== null) {
-            const selectedTaxiUser = taxiUsers[selectedTaxiUserIndex];
-            const taxistaLocation = selectedTaxiUser?.location;
-            if (taxistaLocation) {
-                setTaxiLocation(taxistaLocation);
-            } else {
-                console.log("No se encontró la ubicación del taxista seleccionado");
-            }
-        } else {
-            console.error("No se ha seleccionado ningún taxista.");
-        }
-    };
+
 
     //Compartir mapa
     const handleShareMapsClick = async () => {
@@ -424,6 +408,8 @@ const TextFieldMaps = () => {
         }
     }, []);
 
+
+
     if (!isLoaded) return <div>Loading...</div>;
 
     return (
@@ -574,31 +560,27 @@ const TextFieldMaps = () => {
                                 <DirectionsRenderer directions={directionsResponse} />
                             )}
                             {taxiUsers.map((taxiUser, index) => {
-                                // Asegúrate de que lat y lng son números válidos antes de usarlos
-                                const lat = parseFloat(taxiUser.location?.lat);
-                                const lng = parseFloat(taxiUser.location?.lng);
-                                if (esUbicacionValida(lat, lng)) {
-                                    // Crear el marcador utilizando AdvancedMarkerElement
+                                // Verifica primero si el objeto `ubicacion` o `ubication` existe
+                                const lat = parseFloat(taxiUser.ubicacion?.lat || taxiUser.ubication?.lat);
+                                const lng = parseFloat(taxiUser.ubicacion?.lng || taxiUser.ubication?.lng);
+
+                                if (isFinite(lat) && isFinite(lng)) {
                                     return (
-                                        <Marker
-                                            key={index}
-                                            position={{
-                                                lat: taxiUser.location.lat,
-                                                lng: taxiUser.location.lng,
-                                            }}
-                                            title={taxiUser.name}
-                                            icon={{
-                                                url: taxiUser.imageUrl,
-                                                scaledSize: new window.google.maps.Size(50, 50),
-                                            }}
-                                        />
+                                        <>
+                                            <Marker
+                                                key={index}
+                                                position={{ lat: parseFloat(lat), lng: parseFloat(lng) }}
+                                                title={taxiUser.name}
+                                                icon={{
+                                                    url: taxiUser.imageUrl,
+                                                    scaledSize: new window.google.maps.Size(80, 80),
+                                                }}
+                                            />
+
+                                        </>
                                     );
                                 } else {
-                                    // Opcional: manejar el caso en el que los datos de ubicación no son válidos
-                                    console.error(
-                                        "Datos de ubicación inválidos para",
-                                        taxiUser.name
-                                    );
+                                    console.error(`Latitud o longitud inválidas para el taxista: ${taxiUser.name}`);
                                     return null;
                                 }
                             })}

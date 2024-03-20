@@ -136,21 +136,7 @@ const Journey = () => {
     navigate("/CallMessageConversationMessage");
   };
 
-  var rating = "4";
 
-  const contarUsuarios = (dataList) => {
-    return dataList.length;
-  };
-
-  const generateRating = (rating) => {
-    return Array.from({ length: 5 }).map((_, index) => (
-      <StarIcon
-        key={index}
-        color={index < rating ? "secondary" : "disabled"}
-        sx={{ color: "yellow" }}
-      />
-    ));
-  };
 
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -204,7 +190,7 @@ const Journey = () => {
           },
         }}
       />
-      <AppBar position="static" sx={{ borderRadius: 1, background: "#000" }}>
+      <AppBar position="fixed" sx={{ borderRadius: 1, background: "#000" }}>
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             CABBIE
@@ -258,12 +244,7 @@ const Journey = () => {
           <Avatar src={photoURL} /> {name}
         </MenuItem>
         <Divider />
-        <MenuItem onClick={handleOpenDrawer}>
-          <ListItemIcon>
-            <LocalTaxiIcon fontSize="small" />
-          </ListItemIcon>
-          TAX Seguro
-        </MenuItem>
+         
         <MenuItem
           onClick={() => {
             navigate("/ChatList");
