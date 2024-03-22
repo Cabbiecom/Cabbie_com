@@ -32,13 +32,23 @@ import { styled } from "@mui/material/styles";
 import { grey } from "@mui/material/colors";
 import { auth } from "../Data/Database";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { getDatabase, ref as dbRef, set, get, onValue, query, ref, orderByChild, equalTo } from "firebase/database";
+import {
+    getDatabase,
+    ref as dbRef,
+    set,
+    get,
+    onValue,
+    query,
+    ref,
+    orderByChild,
+    equalTo,
+} from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import StarIcon from "@mui/icons-material/Star";
 import ChatIcon from "@mui/icons-material/Chat";
 import PhoneIcon from "@mui/icons-material/Phone";
 import useFetchTaxiUsers from "./useFetchTaxiUsers";
-import logo from '../Assets/images/CabbieXL.jpeg';
+import logo from "../Assets/images/CabbieXL.jpeg";
 
 const libraries = ["places"];
 
@@ -60,7 +70,6 @@ const Puller = () => (
         }}
     />
 );
-
 
 // Estilos del mapa
 const mapContainerStyle = {
@@ -216,7 +225,6 @@ const TextFieldMaps = () => {
     };
     // Función para obtener la ubicación del taxista seleccionado
 
-
     //Compartir mapa
     const handleShareMapsClick = async () => {
         if (originAddress === "" || destinationAddress === "") {
@@ -344,7 +352,6 @@ const TextFieldMaps = () => {
                         }));
 
                     setTaxiUsers(taxiUsersWithLocation);
-
                 }
             })
             .catch((error) => {
@@ -364,7 +371,6 @@ const TextFieldMaps = () => {
     };
 
     useEffect(() => {
-
         capturarUbicacionTaxista();
         // Otros efectos o inicializaciones aquí
     }, [capturarUbicacionTaxista]); // La lista de dependencias vacía asegura que esto se ejecute una vez al montar el componente
@@ -409,8 +415,6 @@ const TextFieldMaps = () => {
             setContainer(window.document.body);
         }
     }, []);
-
-
 
     if (!isLoaded) return <div>Loading...</div>;
 
@@ -563,8 +567,12 @@ const TextFieldMaps = () => {
                             )}
                             {taxiUsers.map((taxiUser, index) => {
                                 // Verifica primero si el objeto `ubicacion` o `ubication` existe
-                                const lat = parseFloat(taxiUser.ubicacion?.lat || taxiUser.ubication?.lat);
-                                const lng = parseFloat(taxiUser.ubicacion?.lng || taxiUser.ubication?.lng);
+                                const lat = parseFloat(
+                                    taxiUser.ubicacion?.lat || taxiUser.ubication?.lat
+                                );
+                                const lng = parseFloat(
+                                    taxiUser.ubicacion?.lng || taxiUser.ubication?.lng
+                                );
 
                                 if (isFinite(lat) && isFinite(lng)) {
                                     return (
@@ -579,7 +587,9 @@ const TextFieldMaps = () => {
                                         />
                                     );
                                 } else {
-                                    console.error(`Latitud o longitud inválidas para el taxista: ${taxiUser.name}`);
+                                    console.error(
+                                        `Latitud o longitud inválidas para el taxista: ${taxiUser.name}`
+                                    );
                                     return null;
                                 }
                             })}
@@ -642,7 +652,8 @@ const TextFieldMaps = () => {
                                     key={index}
                                     divider
                                     sx={{
-                                        background: selectedTaxiUserIndex === index ? "#808080" : "#fff",
+                                        background:
+                                            selectedTaxiUserIndex === index ? "#808080" : "#fff",
                                         borderRadius: 1,
                                         mb: 1,
                                         cursor: "pointer",
@@ -697,18 +708,17 @@ const TextFieldMaps = () => {
                                 </ListItem>
                             ))}
                         </List>
-
-                        <Button
-                            onClick={handleSelectCabbie}
-                            sx={{
-                                color: "#fff",
-                                width: "100%",
-                                background: "black",
-                            }}
-                        >
-                            Seleccionar Cabbie
-                        </Button>
                     </StyledBox>
+                    <Button
+                        onClick={handleSelectCabbie}
+                        sx={{
+                            color: "#f4f4f4",
+                            width: "100%",
+                            background: "#000",
+                        }}
+                    >
+                        Seleccionar Cabbie
+                    </Button>
                 </SwipeableDrawer>
             </Box>
         </>

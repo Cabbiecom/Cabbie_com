@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { Button, Box, Typography, Link, Grid } from "@mui/material";
+import React from "react";
+import { Button, Box, Typography, Grid } from "@mui/material";
 import AndroidIcon from "@mui/icons-material/Android";
 import AppleIcon from "@mui/icons-material/Apple";
 import { useSpring, animated } from "react-spring";
 import FooterAnimated from "./FooterAnimated";
+import { Link as RouterLink } from 'react-router-dom';
 
 const Footer = () => {
     const fade = useSpring({
@@ -33,7 +34,7 @@ const Footer = () => {
                     justifyContent: "center",
                     alignItems: "center",
                     textAlign: 'center',
-                    marginTop:'40px'
+                    marginTop: '40px'
                 }}
             >
                 <FooterAnimated />
@@ -48,7 +49,7 @@ const Footer = () => {
                     alignContent: "center",
                     alignItems: "center",
                     textAlign: "center",
-                    marginTop:'20px'
+                    marginTop: '20px'
                 }}
             >
                 <Box sx={{ margin: "0 20px" }}>
@@ -108,42 +109,46 @@ const Footer = () => {
             <Box
                 sx={{
                     mt: 4,
+                    justifyContent: 'space-between'
                 }}
             >
-                <Grid item xs={12} sm={6} md={4} lg={3}>
-                    <Box sx={{ mt: 10 }}>
-                        <animated.div style={fade}>
-                            <Link
-                                href="/terms"
-                                underline="hover"
-                                sx={{ mx: 1, color: "rgb(115, 115, 115)" }}
-                            >
-                                Términos y condiciones
-                            </Link>
-                            <Link
-                                href="/privacy"
-                                underline="hover"
-                                sx={{ mx: 1, color: "rgb(115, 115, 115)" }}
-                            >
-                                Privacidad
-                            </Link>
-                            <Link
-                                href="/tutorial"
-                                underline="hover"
-                                sx={{ mx: 1, color: "rgb(115, 115, 115)" }}
-                            >
-                                Tutorial
-                            </Link>
-                            <Link
-                                href="/about"
-                                underline="hover"
-                                sx={{ mx: 1, color: "rgb(115, 115, 115)" }}
-                            >
-                                Acerca de
-                            </Link>
-                        </animated.div>
+
+                <animated.div style={fade}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                        <Grid container spacing={2} justifyContent="center">
+
+                            <Grid item xs={12} sm={6} md={3}>
+                                <Typography textAlign="center">
+                                    <RouterLink to="/Legal" style={{ textDecoration: 'none', color: 'rgb(115, 115, 115)' }}>
+                                        Términos y condiciones
+                                    </RouterLink>
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                                <Typography textAlign="center">
+                                    <RouterLink to="/Legal" style={{ textDecoration: 'none', color: 'rgb(115, 115, 115)' }}>
+                                        Privacidad
+                                    </RouterLink>
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                                <Typography textAlign="center">
+                                    <RouterLink to="/Legal" style={{ textDecoration: 'none', color: 'rgb(115, 115, 115)' }}>
+                                        Tutorial
+                                    </RouterLink>
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                                <Typography textAlign="center">
+                                    <RouterLink to="/Legal" style={{ textDecoration: 'none', color: 'rgb(115, 115, 115)' }}>
+                                        Acerca de
+                                    </RouterLink>
+                                </Typography>
+                            </Grid>
+                        </Grid>
                     </Box>
-                </Grid>
+                </animated.div>
+
                 <Box
                     sx={{
                         mt: 4,
