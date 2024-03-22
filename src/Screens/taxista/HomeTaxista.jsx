@@ -97,7 +97,11 @@ const HomeTaxista = () => {
 
   return (
     <>
-      <AppBar position="fixed" sx={{ borderRadius: 1, background: "#000" }}>
+      <AppBar position="fixed" sx={{
+        borderBottomLeftRadius: 2,
+        borderBottomRightRadius: 2,
+        background: "#000"
+      }}>
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             CABBIE

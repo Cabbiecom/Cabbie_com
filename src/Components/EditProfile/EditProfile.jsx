@@ -102,6 +102,9 @@ const EditProfile = () => {
       <AppBar
         sx={{
           background: "#000",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          borderBottomLeftRadius: '20px',
+          borderBottomRightRadius: '20px',
         }}
       >
         <Toolbar>

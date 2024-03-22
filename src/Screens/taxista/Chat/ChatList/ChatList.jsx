@@ -83,7 +83,12 @@ const ChatList = () => {
 
     return (
         <>
-            <AppBar position="static" sx={{ borderRadius: 2, background: "black" }}>
+            <AppBar position="static" sx={{
+                borderBottomLeftRadius: '20px',
+                borderBottomRightRadius: '20px',
+                background: "black",
+                zIndex: (theme) => theme.zIndex.drawer + 1
+            }}>
                 <Toolbar>
                     {/* Ícono de flecha para regresar */}
                     <IconButton
@@ -111,12 +116,12 @@ const ChatList = () => {
             </AppBar>
             <List sx={{ width: "100%", bgcolor: "background.paper" }}>
                 {userRole === "usuario" && taxiUsers.map((taxiUser, index) => (
-                    <ListItem 
-                    key={index}
+                    <ListItem
+                        key={index}
                         alignItems="flex-start"
                         onClick={handleListItemClick(taxiUser.uid)}
-                        sx={{cursor:'pointer'}}
-                        >
+                        sx={{ cursor: 'pointer' }}
+                    >
 
                         <ListItemAvatar>
                             <Avatar alt={taxiUser.name} src={taxiUser.imageUrl || ""} />
@@ -139,7 +144,7 @@ const ChatList = () => {
                         key={usuarioUser.uid}
                         alignItems="flex-start"
                         onClick={handleListItemClick(usuarioUser.uid)}
-                        sx={{cursor:'pointer'}}
+                        sx={{ cursor: 'pointer' }}
                     >
 
                         <ListItemAvatar>

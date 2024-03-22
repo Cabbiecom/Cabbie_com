@@ -106,7 +106,8 @@ const SignIn = () => {
                 position="fixed"
                 sx={{
                     zIndex: (theme) => theme.zIndex.drawer + 1,
-                    borderRadius: 2,
+                    borderBottomLeftRadius: '20px',
+                  borderBottomRightRadius: '20px', 
                     background: "black",
                     visibility: "visible",
                     display: "-moz-initial",

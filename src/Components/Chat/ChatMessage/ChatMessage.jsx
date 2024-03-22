@@ -53,7 +53,12 @@ const ChatMessage = () => {
 
   return (
     <>
-      <AppBar position="static" sx={{ borderRadius: 2, background: "#000" }}>
+      <AppBar position="static" sx={{
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+                  borderBottomLeftRadius: '20px',
+                  borderBottomRightRadius: '20px', 
+        background: "#000"
+      }}>
         <Toolbar>
           {/* Ícono de flecha para regresar */}
           <IconButton
@@ -89,7 +94,7 @@ const ChatMessage = () => {
             </ListItemAvatar>
             <ListItemText
               primary={taxiUser.name}
-               
+
               sx={{ mr: 2 }} // Asegura espacio para la hora y el ícono
             />
             <Typography
