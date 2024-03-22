@@ -98,8 +98,9 @@ const HomeTaxista = () => {
   return (
     <>
       <AppBar position="fixed" sx={{
-        borderBottomLeftRadius: 2,
-        borderBottomRightRadius: 2,
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+        borderBottomLeftRadius: '20px',
+        borderBottomRightRadius: '20px',
         background: "#000"
       }}>
         <Toolbar>

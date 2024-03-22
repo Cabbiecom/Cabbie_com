@@ -11,7 +11,7 @@ import LocationAdmin from "../Location/LocationAdmin";
 
 const HomeAdmin = () => {
     //
-    
+
     //Variables del usuario
     const [user, loading, error] = useAuthState(auth);
     const [name, setName] = useState("");
@@ -83,7 +83,11 @@ const HomeAdmin = () => {
 
     return (
         <>
-            <AppBar position="fixed" sx={{ borderRadius: 1, background: "#000" }}>
+            <AppBar position="fixed" sx={{
+                zIndex: (theme) => theme.zIndex.drawer + 1,
+                borderBottomLeftRadius: '20px',
+                borderBottomRightRadius: '20px', background: "#000"
+            }}>
                 <Toolbar>
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                         Cabbie Admin

@@ -37,7 +37,7 @@ import { auth } from "../../../../Data/Database";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { getDatabase, ref as dbRef, set, get } from "firebase/database";
 
-function TaxiChatComponent() { 
+function TaxiChatComponent() {
     //Variable con parametros
     let { taxiUserId, UsuarioId } = useParams();
     //Constantes del chat
@@ -195,7 +195,8 @@ function TaxiChatComponent() {
                 position="fixed"
                 sx={{
                     zIndex: (theme) => theme.zIndex.drawer + 1,
-                    borderRadius: 2,
+                    borderBottomLeftRadius: '20px',
+                    borderBottomRightRadius: '20px',
                     background: "black",
                     visibility: "visible",
                     display: "-moz-initial",
