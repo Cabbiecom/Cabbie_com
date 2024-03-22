@@ -147,6 +147,7 @@ const Footer = () => {
                 <Box
                     sx={{
                         mt: 4,
+                        marginBottom: '20px'
                     }}
                 >
                     <animated.div style={fade}>
