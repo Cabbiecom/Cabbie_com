@@ -29,6 +29,7 @@ import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import Snackbar from "@mui/material/Snackbar";
 import { useNavigate } from "react-router-dom";
 import { ArrowForwardIosOutlined } from "@mui/icons-material";
+import Footer from "../../Components/Footer/Footer";
 
 const SignUp = () => {
     const [name, setName] = useState("");
@@ -391,6 +392,7 @@ const SignUp = () => {
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
+            <Footer />
         </>
     );
 };

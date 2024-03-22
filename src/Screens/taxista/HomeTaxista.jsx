@@ -18,7 +18,7 @@ import Logout from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
 import StarIcon from "@mui/icons-material/Star";
 import { useNavigate } from "react-router-dom";
-import { Chat } from "@mui/icons-material";
+import { Chat, SosOutlined } from "@mui/icons-material";
 import LocalTaxiIcon from "@mui/icons-material/LocalTaxi";
 import { signOut } from "firebase/auth";
 import { auth } from "../../Data/Database";
@@ -67,6 +67,7 @@ const HomeTaxista = () => {
         console.error("Error al cerrar sesión: ", error);
       });
   };
+  //
   useEffect(() => {
     if (typeof window !== "undefined") {
       setContainer(window.document.body);
@@ -96,7 +97,7 @@ const HomeTaxista = () => {
 
   return (
     <>
-      <AppBar position="static" sx={{ borderRadius: 1, background: "#000" }}>
+      <AppBar position="fixed" sx={{ borderRadius: 1, background: "#000" }}>
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             CABBIE
@@ -152,9 +153,9 @@ const HomeTaxista = () => {
         <Divider />
         <MenuItem onClick={handleOpenDrawer}>
           <ListItemIcon>
-            <LocalTaxiIcon fontSize="small" />
+            <SosOutlined fontSize="small" />
           </ListItemIcon>
-          TAX Seguro
+          Emergencia
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -171,16 +172,16 @@ const HomeTaxista = () => {
             navigate("/EditProfile");
           }}
         >
-          <ListItemIcon>
+          <ListItemIcon onClick={() => { }}>
             <Settings fontSize="small" />
           </ListItemIcon>
-          Settings
+          Configuraciones
         </MenuItem>
         <MenuItem onClick={handleLogout}>
           <ListItemIcon>
             <Logout fontSize="small" />
           </ListItemIcon>
-          Logout
+          Cerrar Sesión
         </MenuItem>
       </Menu>
       <MapCabbie />

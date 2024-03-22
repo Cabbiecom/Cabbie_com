@@ -52,6 +52,10 @@ const EditProfile = () => {
   const [photoURL, setPhotoURL] = useState("");
 
   const handleUpdate = async () => {
+    if (!user) {
+      console.error("No hay un usuario autenticado.");
+      return;
+    }
     let imageUrl = ""; // Por defecto, vacío si no se sube una nueva imagen
 
     // Subir la nueva imagen a Firebase Storage, si se seleccionó una

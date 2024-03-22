@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { GoogleMap, LoadScript, useJsApiLoader } from "@react-google-maps/api";
+import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 import { auth } from "../../../Data/Database";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { getDatabase, ref as dbRef, set, get } from "firebase/database";

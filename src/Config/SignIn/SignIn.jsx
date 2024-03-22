@@ -12,6 +12,7 @@ import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import { AppBar, Card, CardContent, Toolbar } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import Footer from "../../Components/Footer/Footer";
 
 const SignIn = () => {
     const [openAlert, setOpenAlert] = useState(false);
@@ -34,7 +35,6 @@ const SignIn = () => {
     };
 
     const handleLogin = async (event) => {
-        //ELauth
         const auth = getAuth();
         event.preventDefault();
         try {
@@ -47,14 +47,27 @@ const SignIn = () => {
             // Usuario autenticado correctamente, obtener datos adicionales de Realtime Database
             const uid = userCredential.user.uid;
             const db = getDatabase();
-            const userRef = ref(db, `Users/UsersClient/${uid}`);
-            const snapshot = await get(userRef);
+
+            // Primero, intenta obtener el usuario como AdminSuperior
+            let userRef = ref(db, `Users/AdminSuperior`);
+            let snapshot = await get(userRef);
+            if (snapshot.exists() && snapshot.val().email === email) {
+                // Si el usuario es AdminSuperior y coincide el email, redirige al home del admin
+                navigate("/HomeAdmin");
+                return; // Detén la ejecución para evitar más comprobaciones
+            }
+
+            // Si no es AdminSuperior, verifica si es un usuario cliente
+            userRef = ref(db, `Users/UsersClient/${uid}`);
+            snapshot = await get(userRef);
             if (snapshot.exists()) {
                 const userRole = snapshot.val().role;
                 if (userRole === "taxista") {
                     navigate("/HomeTaxista");
                 } else if (userRole === "usuario") {
                     navigate("/HomeScreen");
+                } else if (userRole === "admin") {
+                    navigate("/HomeAdmin");
                 } else {
                     // Si el rol no es ni 'taxista' ni 'usuario', maneja el caso (por ejemplo, mostrando una alerta)
                     showAlert("Rol de usuario no reconocido.", "warning");
@@ -67,6 +80,7 @@ const SignIn = () => {
             showAlert(`Error en el inicio de sesión: ${error.message}`, "error");
         }
     };
+
 
     useEffect(() => {
         getRedirectResult(auth)
@@ -102,7 +116,7 @@ const SignIn = () => {
                 }}
             >
                 <Toolbar>
-                    <Typography component="h1" variant="h5">
+                    <Typography component="h1" variant="h5" sx={{ color: '#f4f4f4' }}>
                         Iniciar sesión
                     </Typography>
                 </Toolbar>
@@ -113,20 +127,19 @@ const SignIn = () => {
                 sx={{
                     overflowY: "auto",
                     padding: "10px",
-                    marginTop: 10,
                     marginBottom: 4,
                     maxWidth: "100%",
                     flexGrow: 1,
-                    height:'80vh',
-                    
+                    height: '100vh',
+
                 }}
             >
                 <Box
                     sx={{
                         display: "flex",
                         flexDirection: "column",
-                        height:'100%',
-                        justifyContent:'center'
+                        height: '100%',
+                        justifyContent: 'center'
                     }}
                 >
                     <Card
@@ -312,6 +325,7 @@ const SignIn = () => {
                     </Snackbar>
                 </Box>
             </Container>
+            <Footer />
         </>
     );
 };

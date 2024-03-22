@@ -344,6 +344,7 @@ const TextFieldMaps = () => {
                         }));
 
                     setTaxiUsers(taxiUsersWithLocation);
+
                 }
             })
             .catch((error) => {
@@ -363,6 +364,7 @@ const TextFieldMaps = () => {
     };
 
     useEffect(() => {
+
         capturarUbicacionTaxista();
         // Otros efectos o inicializaciones aquí
     }, [capturarUbicacionTaxista]); // La lista de dependencias vacía asegura que esto se ejecute una vez al montar el componente
@@ -566,18 +568,15 @@ const TextFieldMaps = () => {
 
                                 if (isFinite(lat) && isFinite(lng)) {
                                     return (
-                                        <>
-                                            <Marker
-                                                key={index}
-                                                position={{ lat: parseFloat(lat), lng: parseFloat(lng) }}
-                                                title={taxiUser.name}
-                                                icon={{
-                                                    url: taxiUser.imageUrl,
-                                                    scaledSize: new window.google.maps.Size(80, 80),
-                                                }}
-                                            />
-
-                                        </>
+                                        <Marker
+                                            key={index} // Considera usar un identificador único más robusto si está disponible
+                                            position={{ lat, lng }}
+                                            title={taxiUser.name}
+                                            icon={{
+                                                url: taxiUser.imageUrl,
+                                                scaledSize: new window.google.maps.Size(80, 80),
+                                            }}
+                                        />
                                     );
                                 } else {
                                     console.error(`Latitud o longitud inválidas para el taxista: ${taxiUser.name}`);

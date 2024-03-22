@@ -22,8 +22,7 @@ function useFetchTaxiUsers() {
                 }
             });
             setTaxiUsers(users);
-            const usuariosString = JSON.stringify(taxiUsers, null, 2);
-            console.log(usuariosString);
+      
         });
 
         // Llamar a `unsubscribe` para limpiar la suscripción

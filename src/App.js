@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
 //import logo from "./Assets/images/Cabbie.png";
 import "./App.css";
@@ -16,6 +16,7 @@ import HomeTaxista from "./Screens/taxista/HomeTaxista";
 import TaxiChatComponent from "./Screens/taxista/Chat/ChatTaxista/TaxiChatComponent";
 import ChatList from "./Screens/taxista/Chat/ChatList/ChatList";
 import ChatConversationClient from "./Screens/taxista/Chat/ChatConversation/ChatConversationClient";
+import HomeAdmin from "./Screens/Admin/Home/HomeAdmin";
 
 // Componente SplashScreen
 //const SplashScreen = () => (
@@ -42,13 +43,15 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" exact element={<SignIn />} />
+        <Route path="/SignUp" element={<SignUp />} />
+        <Route path="HomeAdmin" element={<HomeAdmin />} />
         <Route path="/HomeScreen" element={<HomeScreen />} />
         <Route path="/HomeTaxista" element={<HomeTaxista />} />
         <Route path="/Journey" element={<Journey />} />
         <Route path="/Profile" element={<Profile />} />
         <Route path="/ConversationMessage" element={<ConversationMessage />} />
         <Route path="/EditProfile" element={<EditProfile />} />
-        <Route path="/SignUp" element={<SignUp />} />
+
         <Route
           path="/CallMessageConversationMessage"
           element={<CallMessageConversationMessage />}
