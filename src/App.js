@@ -18,6 +18,7 @@ import ChatList from "./Screens/taxista/Chat/ChatList/ChatList";
 import ChatConversationClient from "./Screens/taxista/Chat/ChatConversation/ChatConversationClient";
 import HomeAdmin from "./Screens/Admin/Home/HomeAdmin";
 import Legal from "./Screens/Page/Legal";
+import Dashboard from "./Screens/Admin/Dashboard/Dashboard";
 
 // Componente SplashScreen
 //const SplashScreen = () => (
@@ -53,7 +54,7 @@ function App() {
         <Route path="/Profile" element={<Profile />} />
         <Route path="/ConversationMessage" element={<ConversationMessage />} />
         <Route path="/EditProfile" element={<EditProfile />} />
-        
+        <Route path="/Dashboard" element={<Dashboard /> } />
         <Route
           path="/CallMessageConversationMessage"
           element={<CallMessageConversationMessage />}

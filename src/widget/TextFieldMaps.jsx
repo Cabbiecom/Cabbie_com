@@ -127,7 +127,7 @@ const TextFieldMaps = () => {
 
     // Renderizado del mapa de google
     const mapRef = useRef(null);
-    const myRef = useRef(null);
+
 
     const onMapLoad = useCallback((map) => {
         mapRef.current = map;
@@ -215,7 +215,11 @@ const TextFieldMaps = () => {
         if (selectedTaxiUserIndex !== null) {
             const selectedTaxiUser = taxiUsers[selectedTaxiUserIndex];
             if (selectedTaxiUser) {
-                HandleNavegateComponents(selectedTaxiUser.uid);
+
+                // Navega y pasa el estado adicional
+                navigate(`/chat/${selectedTaxiUser.uid}`, {
+                    state: { originAddress, destinationAddress },
+                });
             } else {
                 console.error("Taxista seleccionado no válido.");
             }
@@ -244,7 +248,7 @@ const TextFieldMaps = () => {
             try {
                 await navigator.share({
                     title: "Compartir Ubicación",
-                    text: "Mira esta ubicación en el mapa.",
+                    text: "Mira la ruta en el mapa.",
                     url: googleMapsRouteUrl,
                 });
             } catch (error) {
@@ -253,7 +257,7 @@ const TextFieldMaps = () => {
             }
         } else {
             if (window.Android && typeof window.Android.share === "function") {
-                const textToShare = `Mira esta ubicación en el mapa: ${googleMapsRouteUrl}`;
+                const textToShare = `Mira la ruta en el mapa: ${googleMapsRouteUrl}`;
                 window.Android.share(textToShare);
             } else {
                 setAlertMessage(

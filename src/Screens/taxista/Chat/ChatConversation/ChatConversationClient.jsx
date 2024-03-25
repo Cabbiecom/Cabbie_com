@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom"; // Si estás usando react-router
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PhoneIcon from "@mui/icons-material/Phone";
 import VideocamIcon from "@mui/icons-material/Videocam";
-//import logo from "../../../../Assets/images/Cabbie.png";
+import logo from "../../../../Assets/images/Cabbie.png";
 import Menu from "@mui/material/Menu";
 import {
     Dialog,
@@ -52,6 +52,8 @@ import {
     uploadBytesResumable,
     getDownloadURL,
 } from "firebase/storage";
+import { remove } from 'firebase/database';
+
 
 function ChatConversationClient() {
     //controla la visibilidad
@@ -92,6 +94,7 @@ function ChatConversationClient() {
     //COnstatntes para renderisar images
     const [imagePreview, setImagePreview] = useState(null);
     const [openDialog, setOpenDialog] = useState(false);
+
     const handleCapture = ({ target }) => {
         const fileReader = new FileReader();
         const file = target.files[0];
@@ -110,11 +113,15 @@ function ChatConversationClient() {
     };
 
     const handleSendPhoto = () => {
-        if (!imagePreview) return;
+        if (!imagePreview) {
+            console.error("No hay imagen para previsualizar.");
+            return;
+        }
+
 
         // Obtiene una referencia al almacenamiento de Firebase
         const storage = getStorage();
-        const storagePath = `Users/UsersClient/images/${new Date().getTime()}`;
+        const storagePath = `Users/UsersClient/imagesclient/${new Date().getTime()}`;
         const imageRef = storageRef(storage, storagePath);
 
         // Aquí debes convertir imagePreview (que es una URL de objeto local) a un Blob o File
@@ -134,7 +141,11 @@ function ChatConversationClient() {
                     },
                     (error) => {
                         // Manejar errores aquí
-                        console.log(error);
+                        console.error(error);
+                        // Aquí podrías actualizar el estado para mostrar un mensaje de error al usuario.
+                        setSnackbarMessage("Error al cargar la imagen");
+                        setSnackbarSeverity("error");
+                        setSnackbarOpen(true);
                     },
                     () => {
                         // Obtiene la URL de la imagen subida y guarda el mensaje en la base de datos
@@ -146,7 +157,7 @@ function ChatConversationClient() {
 
                             // Guarda el mensaje en la base de datos
                             const database = getDatabase();
-                            const chatRef = dbRef(database, `Chats/${chatId}/messages`);
+                            const chatRef = dbRef(database, `Chats/${chatId}/messages/imagesclient`);
                             const newMessageRef = push(chatRef);
                             set(newMessageRef, {
                                 senderId: user.uid,
@@ -161,8 +172,10 @@ function ChatConversationClient() {
                         });
                     }
                 );
-            });
+            }
+            );
     };
+
 
     //Variables para el role
     const chatId =
@@ -172,22 +185,27 @@ function ChatConversationClient() {
 
     //Menu del menssage
     const handleOpenMenu = (event, message) => {
+        console.log("Abriendo menú para mensaje:", message);
         setAnchorElMenu(event.currentTarget);
-        setSelectedMessage(message);
+        setSelectedMessage(message.id);
     };
     const handleCloseMenu = () => {
         setAnchorElMenu(null);
     };
 
     const handleMenuAction = (action) => {
-        setSnackbarMessage(
-            `Action ${action} selected for message: ${selectedMessage}`
-        );
-        setSnackbarSeverity("succes");
-        setSnackbarOpen(true);
-        // Aquí puedes agregar lo que sucederá cuando se seleccione una acción
+        if (action === "delete") {
+            // Asegúrate de que selectedMessage sea el ID del mensaje a eliminar
+            deleteMessage(selectedMessage);
+            // El manejo de mensajes y estado de snackbar se puede mover a la función deleteMessage
+        } else {
+            setSnackbarMessage(`Action ${action} selected for message: ${selectedMessage}`);
+            setSnackbarSeverity("info");
+            setSnackbarOpen(true);
+        }
         handleCloseMenu();
     };
+
 
     //anchor
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -267,11 +285,49 @@ function ChatConversationClient() {
                     id: key,
                 }));
 
-                // Procesa los mensajes aquí, como actualizar el estado
-                setMessages(messagesList);
+                // Nuevo array para almacenar tanto los mensajes normales como los de ubicación
+                let combinedMessages = [];
 
                 // Iterar sobre los mensajes para obtener información del usuario si es necesario
                 messagesList.forEach((msg) => {
+                    // Agregar el mensaje directamente si no es un mensaje de ubicación
+                    if (msg.type !== "location") {
+                        combinedMessages.push(msg);
+                    } else {
+                        // Cargar mensajes de ubicación desde la ruta específica
+                        const viajeRef = dbRef(
+                            database,
+                            `Chats/${chatId}/messages/Viajes/${msg.id}`
+                        );
+                        get(viajeRef)
+                            .then((viajeSnapshot) => {
+                                if (viajeSnapshot.exists()) {
+                                    const viajeData = viajeSnapshot.val();
+                                    // Asegúrate de que la información de la ubicación esté completa antes de agregarla
+                                    if (
+                                        viajeData.originAddress &&
+                                        viajeData.destinationAddress &&
+                                        viajeData.mapImageUrl
+                                    ) {
+                                        combinedMessages.push({
+                                            ...msg,
+                                            originAddress: viajeData.originAddress,
+                                            destinationAddress: viajeData.destinationAddress,
+                                            imageUrl: viajeData.mapImageUrl,
+                                            link: viajeData.routeMessage,
+                                            // Aquí puedes añadir cualquier otra información relevante de viajeData
+                                        });
+
+                                        // Actualiza el estado de mensajes después de procesar la información de ubicación
+                                        setMessages(combinedMessages);
+                                    }
+                                }
+                            })
+                            .catch((error) => {
+                                console.error("Error al cargar la ubicación del viaje:", error);
+                            });
+                    }
+
                     if (msg.senderId && !usersInfo[msg.senderId]) {
                         fetchUserInfo(msg.senderId).then((userInfo) => {
                             if (userInfo) {
@@ -283,9 +339,13 @@ function ChatConversationClient() {
                         });
                     }
                 });
+                // Asegúrate de actualizar el estado fuera de la condición de ubicación, para los mensajes normales
+                if (!messagesList.some((msg) => msg.type === "location")) {
+                    setMessages(combinedMessages);
+                }
             }
         });
-    }, [chatId, database, fetchUserInfo, usersInfo]);
+    }, [chatId, database, fetchUserInfo, messages, usersInfo]);
 
     // Cargar mensajes
     useEffect(() => {
@@ -398,18 +458,106 @@ function ChatConversationClient() {
                     setSnackbarOpen(true);
                 });
 
+            const createLocationMessage = (
+                routeMessage,
+                mapImageUrl,
+                origin,
+                destination,
+
+            ) => {
+                return {
+                    type: "location",
+                    link: routeMessage,
+                    imageUrl: mapImageUrl,
+                    origin,
+                    destination,
+                    textrut: `Ruta a ${destinationAddress}.`,
+                    sender: "system",
+                    time: timeString
+                };
+            };
+
             setMessages((prevMessages) => [
                 ...prevMessages,
-                {
-                    type: "location", // Nuevo tipo de mensaje 'location'
-                    link: routeMessage,
-                    imageUrl: mapImageUrl, // URL de la imagen estática del mapa
-                    time: timeString,
-                    sender: "system",
-                }, // 'system' para identificar mensajes del sistema
+                createLocationMessage(
+                    routeMessage,
+                    mapImageUrl,
+                    originAddress,
+                    destinationAddress,
+                    timeString
+                ),
+
             ]);
+            //console.log("Route Message URL:", routeMessage);
+            //console.log("Map Image URL:", mapImageUrl);
+            // Aquí, después de actualizar el estado.
+
         }
     }, [originAddress, destinationAddress, chatId]);
+
+    // MessageText.js
+    function MessageText({ msg, userUid, participantsInfo }) {
+        // Componente para mensajes de texto
+        return (
+            <>
+                <ListItem
+
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        bgcolor:
+                            msg.senderId === user.uid ? "#808080" : "#f0f0f0",
+                        color: msg.senderId === user.uid ? "#fff" : "#000",
+                        borderRadius: "20px",
+                        mb: 1,
+                        maxWidth: "100%",
+                        alignSelf:
+                            msg.senderId === user.uid ? "flex-end" : "flex-start",
+                    }}
+                >
+                    <ListItemText
+
+                    >
+                        <Typography
+                            variant="body2"
+                            color={msg.senderId === user.uid ? "#f4f4f4" : "#000"}
+                            sx={{ wordBreak: "break-word" }}
+                        >
+                            {msg.text}
+                        </Typography>
+                        <Typography
+                            variant="body3"
+                            color={msg.senderId === user.uid ? "#f4f4f4" : "#000"}>
+                            {new Date(msg.timestamp).toLocaleTimeString()}
+                        </Typography>
+
+                    </ListItemText>
+
+                </ListItem>
+            </>
+        );
+    }
+
+    //Funcion delete
+    const deleteMessage = (messageId) => {
+        const messageRef = dbRef(database, `Chats/${chatId}/messages/${messageId}`);
+        remove(messageRef)
+            .then(() => {
+                console.log("Mensaje eliminado exitosamente");
+                // Aquí puedes actualizar el estado o realizar otras acciones después de la eliminación exitosa
+                setSnackbarMessage("Mensaje eliminado exitosamente");
+                setSnackbarSeverity("success");
+                setSnackbarOpen(true);
+            })
+            .catch((error) => {
+                console.error("Error eliminando mensaje: ", error);
+                // Manejar el error, posiblemente actualizando el estado para mostrar un mensaje de error
+                setSnackbarMessage("Error al eliminar mensaje");
+                setSnackbarSeverity("error");
+                setSnackbarOpen(true);
+            });
+    };
+
 
     if (loading) {
         return <div>Loading...</div>;
@@ -430,8 +578,8 @@ function ChatConversationClient() {
                 position="fixed"
                 sx={{
                     zIndex: (theme) => theme.zIndex.drawer + 1,
-                    borderBottomLeftRadius: '20px',
-                  borderBottomRightRadius: '20px', 
+                    borderBottomLeftRadius: "20px",
+                    borderBottomRightRadius: "20px",
                     background: "black",
                     visibility: "visible",
                     display: "-moz-initial",
@@ -560,87 +708,79 @@ function ChatConversationClient() {
                                     gap: "20px",
                                 }}
                             >
-                                {msg.senderId !== user.uid &&
-                                    // Asegúrate de que tienes información del remitente antes de intentar mostrarla
-                                    (participantsInfo[msg.senderId] ? (
-                                        <Avatar
-                                            src={participantsInfo[msg.senderId].imageUrl}
-                                            alt={
-                                                participantsInfo[msg.senderId].name ||
-                                                "Nombre Desconocido"
-                                            }
-                                        />
-                                    ) : (
-                                        <Avatar
-                                            src={usersInfo?.imageUrl}
-                                            alt={usersInfo?.name || "Nombre Desconocido"}
-                                        />
-                                    ))}
-                                <ListItem
-                                    key={index}
-                                    sx={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        bgcolor: msg.senderId === user.uid ? "#808080" : "#f0f0f0",
-                                        color: msg.senderId === user.uid ? "#fff" : "#000",
-                                        borderRadius: "20px",
-                                        mb: 1,
-                                        maxWidth: "100%",
-                                        alignSelf:
-                                            msg.senderId === user.uid ? "flex-end" : "flex-start",
-                                    }}
-                                >
-                                    <ListItemText
-                                        onClick={(event) => handleOpenMenu(event, message)}
-                                        primary={msg.text}
-                                        secondary={new Date(msg.timestamp).toLocaleTimeString()}
-                                        primaryTypographyProps={{
-                                            style: {
-                                                wordBreak: "break-word",
-                                                color: msg.senderId === user.uid ? "#fff" : "#000",
-                                            },
-                                        }}
-                                    />
-                                    {msg.type === "location" ? (
-                                        // Renderiza el mensaje de ubicación con una imagen y un enlace
-                                        <div>
-                                            <a
-                                                href={msg.link}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
+
+                                <>
+                                    {msg.senderId !== user.uid &&
+                                        // Asegúrate de que tienes información del remitente antes de intentar mostrarla
+                                        (participantsInfo[msg.senderId] ? (
+                                            <Avatar
+                                                src={participantsInfo[msg.senderId].imageUrl}
+                                                alt={
+                                                    participantsInfo[msg.senderId].name ||
+                                                    "Nombre Desconocido"
+                                                }
+                                            />
+                                        ) : (
+                                            <Avatar
+                                                src={usersInfo?.imageUrl}
+                                                alt={usersInfo?.name || "Nombre Desconocido"}
+                                            />
+                                        ))}
+                                    {msg.type === "location" && msg.imageUrl ? (
+                                        <>
+                                            <div
+                                                style={{
+                                                    cursor: "pointer",
+                                                    maxWidth: "80%",
+                                                    alignSelf: msg.senderId === user.uid ? "flex-start" : "flex-end",
+                                                }}
+                                                onClick={() => window.open(msg.link, "_blank")}
                                             >
+                                                <Typography variant="body2" color="textSecondary">
+                                                    Ruta desde {originAddress} a {destinationAddress}
+                                                </Typography>
                                                 <img
                                                     src={msg.imageUrl}
                                                     alt="Mapa de la ruta"
                                                     style={{
                                                         width: "200px",
-                                                        height: "20vh",
-                                                        borderRadius: "20px",
+                                                        height: "20vh", borderRadius: "20px"
                                                     }}
                                                 />
-                                            </a>
-                                        </div>
+                                                <Typography variant="body2" color="textSecondary">
+                                                    {msg.time}, Toque para ver detalles
+                                                </Typography>
+                                            </div>
+                                        </>
                                     ) : (
-                                        // Renderiza otros tipos de mensajes
                                         <>
-                                            <p>{msg.time}</p>
+                                            <div onClick={(event) => handleOpenMenu(event, msg)}>
+                                                <MessageText msg={msg} userUid={user.uid} participantsInfo={participantsInfo} />
+                                            </div>
                                         </>
                                     )}
-                                </ListItem>
+                                    {msg.type === "image" && (
+                                        <img src={msg.imageUrl}
+                                            alt="Imagen enviada"
+                                            style={{
+                                                maxWidth: "200px",
+                                                maxHeight: "200px",
+                                                borderRadius: "10px"
+                                            }} />
+                                    )}
+                                    {msg.senderId === user.uid && (
+                                        <>
+                                            <Avatar
+                                                src={usersInfo[msg.senderId]?.imageUrl || logo}
+                                                alt={
+                                                    usersInfo[msg.senderId]?.name ||
+                                                    "Nombre Desconocido"
+                                                }
+                                            />
+                                        </>
+                                    )}
+                                </>
 
-                                {msg.senderId === user.uid && (
-                                    <>
-                                        <Avatar
-                                            src={
-                                                usersInfo[msg.senderId]?.imageUrl ||
-                                                "URL_DE_IMAGEN_POR_DEFECTO"
-                                            }
-                                            alt={
-                                                usersInfo[msg.senderId]?.name || "Nombre Desconocido"
-                                            }
-                                        />
-                                    </>
-                                )}
                             </div>
                         </React.Fragment>
                     ))}
@@ -663,7 +803,7 @@ function ChatConversationClient() {
                         </div>
                     )}
                 </List>
-                <div ref={messagesEndRef} />
+
                 <br />
                 <br />
                 <Menu
@@ -672,8 +812,8 @@ function ChatConversationClient() {
                     onClose={handleCloseMenu}
                 >
                     {/* Aquí se mapean las opciones del menú con sus respectivos íconos */}
-                    <MenuItem onClick={() => handleMenuAction("action1")}>
-                        Acción 1
+                    <MenuItem onClick={() => handleMenuAction("delete")}>
+                        Delete
                     </MenuItem>
                     {/* Agrega más opciones de menú según necesites */}
                 </Menu>

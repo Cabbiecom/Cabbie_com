@@ -1,24 +1,23 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
+import ReactDOM from "react-dom/client"; // Correct import for React 18
 import "./index.css";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 const theme = createTheme({
-  // puedes personalizar tu tema aquí
+  palette: {
+    primary: {
+      main: "#556cd6",
+      light: "#888cd6", // Make sure to define the properties you use, like 'light'
+    },
+  },
 });
 
+// Correct way to initialize the app in React 18
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
-    <ThemeProvider theme={theme}>
-      <App />
-    </ThemeProvider>
-  </React.StrictMode>
+  <ThemeProvider theme={theme}>
+    <App />
+  </ThemeProvider>
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();

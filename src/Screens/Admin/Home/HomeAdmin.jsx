@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../../Data/Database";
 import { useNavigate } from "react-router-dom";
-import { Chat, Logout, Settings, SosOutlined } from "@mui/icons-material";
+import { Chat, Dashboard, Logout, Settings, SosOutlined } from "@mui/icons-material";
 import { signOut } from "firebase/auth";
 import { getDatabase, ref as dbRef, set, get } from "firebase/database";
 import LocationAdmin from "../Location/LocationAdmin";
@@ -140,6 +140,16 @@ const HomeAdmin = () => {
                         <Avatar src={photoURL} /> {name}
                     </MenuItem>
                     <Divider />
+                    <MenuItem
+                        onClick={() => {
+                            navigate("/Dashboard");
+                        }}
+                    >
+                        <ListItemIcon>
+                            <Dashboard fontSize="small" />
+                        </ListItemIcon>
+                        Dashboard
+                    </MenuItem>
                     <MenuItem onClick={handleOpenDrawer}>
                         <ListItemIcon>
                             <SosOutlined fontSize="small" />
