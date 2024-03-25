@@ -10,14 +10,12 @@ import {
     Menu,
     IconButton,
     useMediaQuery,
-    Card,
-    Paper,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useTheme } from "@emotion/react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSpring, animated } from "react-spring";
-import { ArrowBackIos, Circle } from "@mui/icons-material";
+import { ArrowBackIos } from "@mui/icons-material";
 
 import { ReactComponent as CabbieSVG } from "./svg/security_on.svg";
 import { ReactComponent as PersonSVG } from "./svg/personal_info_re.svg";
@@ -163,7 +161,7 @@ const Legal = () => {
                 <Parallax bgImage="../../Assets/images/Cabbie.png" strength={500}>
                     <Box
                         sx={{
-                            height: 1600,
+                            height: 1800,
                             display: "flex",
                             flexDirection: "column",
                             justifyContent: "center",
