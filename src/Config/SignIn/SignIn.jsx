@@ -44,6 +44,14 @@ const SignIn = () => {
                 password
             );
 
+            // Aquí asumimos que el inicio de sesión fue exitoso
+            showAlert("Inicio de sesión exitoso.", "success");
+
+            // Llamada a la interfaz de JavaScript para notificar a la app de Android
+            if (window.AndroidApp) {
+                window.AndroidApp.onSignIn(true);
+            }
+
             // Usuario autenticado correctamente, obtener datos adicionales de Realtime Database
             const uid = userCredential.user.uid;
             const db = getDatabase();
@@ -78,6 +86,11 @@ const SignIn = () => {
         } catch (error) {
             console.error("Error en el inicio de sesión:", error);
             showAlert(`Error en el inicio de sesión: ${error.message}`, "error");
+
+            // Notificar al contexto de Android sobre el fallo
+            if (window.AndroidApp) {
+                window.AndroidApp.onSignIn(false);
+            }
         }
     };
 
@@ -125,7 +138,7 @@ const SignIn = () => {
             <Box
                 sx={{
                     width: '100%',
-                    background:'#f4f4f4'
+                    background: '#f4f4f4'
                 }}>
                 <Container
                     component="main"
