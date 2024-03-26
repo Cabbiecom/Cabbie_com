@@ -22,7 +22,7 @@ const Footer = () => {
                 textAlign: "center",
                 alignContent: 'center',
                 alignItems: 'center',
-                height: "90vh",
+                height: "100vh",
                 background: "#f4f4f4",
             }}
         >
@@ -60,6 +60,7 @@ const Footer = () => {
                     >
                         Descarga la app
                     </Typography>
+                    <br/>
                     <Grid container spacing={2} justifyContent="center" >
                         <Grid item xs={12} sm={6} md={4} lg={3}>
                             <animated.div style={fade}>

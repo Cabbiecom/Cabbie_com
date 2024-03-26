@@ -115,8 +115,8 @@ const SignUp = () => {
                 position="fixed"
                 sx={{
                     zIndex: (theme) => theme.zIndex.drawer + 1,
-                    borderBottomLeftRadius: '20px',
-                  borderBottomRightRadius: '20px', 
+                    borderBottomLeftRadius: "20px",
+                    borderBottomRightRadius: "20px",
                     background: "black",
                     visibility: "visible",
                     display: "-moz-initial",
@@ -131,137 +131,53 @@ const SignUp = () => {
                     </Typography>
                 </Toolbar>
             </AppBar>
-            <Container
-                component="main"
-                maxWidth="xs"
+            <Box
+                sx={{
+                    width: "100%",
+                    background: "#f4f4f4",
+                }}
             >
-                <Box
+                <Container
+                    component="main"
+                    maxWidth="xs"
                     sx={{
-                        marginTop: 6,
                         marginBottom: 4,
-                        maxWidth: "100%",
                         flexGrow: 1,
+                        height: "100vh",
                     }}
                 >
-                    <Card
-                        raised
+                    <Box
                         sx={{
-                            background: "#fff",
-
-                            marginTop: 10,
+                            display: "flex",
+                            flexDirection: "column",
+                            height: "100%",
+                            justifyContent: "center",
                         }}
                     >
-                        <CardContent
+                        <Card
+                            raised
                             sx={{
-                                display: "flex",
-                                flexDirection: "column",
-                                alignItems: "center",
+                                background: "#fff",
+
+                                marginTop: 10,
                             }}
                         >
-                            <TextField
-                                margin="normal"
-                                required
-                                fullWidth
-                                label="Nombre"
-                                autoFocus
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                variant="filled"
+                            <CardContent
                                 sx={{
-                                    width: "100%",
-                                    backgroundColor: "#EDEDED",
-                                    borderRadius: 2,
-                                    "& .MuiFilledInput-underline:before": {
-                                        borderBottom: "none", // Elimina la línea inferior en el estado normal
-                                    },
-                                    "& .MuiFilledInput-underline:after": {
-                                        borderBottom: "none", // Elimina la línea inferior en el estado activo/foco
-                                    },
-                                    "& .MuiFilledInput-underline:hover:before": {
-                                        borderBottom: "none", // Elimina la línea inferior al pasar el ratón por encima
-                                    },
-                                    "& .MuiFilledInput-root": {
-                                        backgroundColor: "rgba(0,0,0,0)", // Hace el fondo transparente
-                                        "&:hover": {
-                                            backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente al pasar el ratón por encima
-                                        },
-                                        "&.Mui-focused": {
-                                            backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente en el estado de foco
-                                        },
-                                    },
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    marginBottom: '30%'
                                 }}
-                            />
-                            <TextField
-                                margin="normal"
-                                required
-                                fullWidth
-                                label="Correo Electrónico"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                variant="filled"
-                                sx={{
-                                    width: "100%",
-                                    backgroundColor: "#EDEDED",
-                                    borderRadius: 2,
-                                    "& .MuiFilledInput-underline:before": {
-                                        borderBottom: "none", // Elimina la línea inferior en el estado normal
-                                    },
-                                    "& .MuiFilledInput-underline:after": {
-                                        borderBottom: "none", // Elimina la línea inferior en el estado activo/foco
-                                    },
-                                    "& .MuiFilledInput-underline:hover:before": {
-                                        borderBottom: "none", // Elimina la línea inferior al pasar el ratón por encima
-                                    },
-                                    "& .MuiFilledInput-root": {
-                                        backgroundColor: "rgba(0,0,0,0)", // Hace el fondo transparente
-                                        "&:hover": {
-                                            backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente al pasar el ratón por encima
-                                        },
-                                        "&.Mui-focused": {
-                                            backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente en el estado de foco
-                                        },
-                                    },
-                                }}
-                            />
-                            <TextField
-                                margin="normal"
-                                required
-                                fullWidth
-                                label="Contraseña"
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                variant="filled"
-                                sx={{
-                                    width: "100%",
-                                    backgroundColor: "#EDEDED",
-                                    borderRadius: 2,
-                                    "& .MuiFilledInput-underline:before": {
-                                        borderBottom: "none", // Elimina la línea inferior en el estado normal
-                                    },
-                                    "& .MuiFilledInput-underline:after": {
-                                        borderBottom: "none", // Elimina la línea inferior en el estado activo/foco
-                                    },
-                                    "& .MuiFilledInput-underline:hover:before": {
-                                        borderBottom: "none", // Elimina la línea inferior al pasar el ratón por encima
-                                    },
-                                    "& .MuiFilledInput-root": {
-                                        backgroundColor: "rgba(0,0,0,0)", // Hace el fondo transparente
-                                        "&:hover": {
-                                            backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente al pasar el ratón por encima
-                                        },
-                                        "&.Mui-focused": {
-                                            backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente en el estado de foco
-                                        },
-                                    },
-                                }}
-                            />
-                            <FormControl fullWidth margin="normal">
-                                <InputLabel>Rol</InputLabel>
-                                <Select
-                                    value={role}
-                                    label="Rol"
-                                    onChange={(e) => setRole(e.target.value)}
+                            >
+                                <TextField
+                                    margin="normal"
+                                    required
+                                    fullWidth
+                                    label="Nombre"
+                                    autoFocus
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
                                     variant="filled"
                                     sx={{
                                         width: "100%",
@@ -286,100 +202,203 @@ const SignUp = () => {
                                             },
                                         },
                                     }}
-                                >
-                                    <MenuItem value="taxista">Taxista</MenuItem>
-                                    <MenuItem value="usuario">Usuario</MenuItem>
-                                </Select>
-                            </FormControl>
-                            <IconButton
-                                color="primary"
-                                aria-label="upload picture"
-                                component="label"
-                                sx={{ mt: 2 }}
-                            >
-                                <input
-                                    hidden
-                                    accept="image/*"
-                                    type="file"
-                                    onChange={handleImageChange}
                                 />
-                                <PhotoCamera />
-                            </IconButton>
-                            {preview && (
-                                <Box sx={{ mb: 2 }}>
-                                    <Avatar src={preview} sx={{ width: 100, height: 100 }} />
-                                </Box>
-                            )}
-                            <Button
-                                type="submit"
-                                fullWidth
-                                variant="contained"
-                                sx={{ mt: 3, mb: 2, background: "#000", color: "#fff" }}
-                                onClick={handleSignUp}
-                            >
-                                Registrarse
-                            </Button>
-                        </CardContent>
-                    </Card>
+                                <TextField
+                                    margin="normal"
+                                    required
+                                    fullWidth
+                                    label="Correo Electrónico"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    variant="filled"
+                                    sx={{
+                                        width: "100%",
+                                        backgroundColor: "#EDEDED",
+                                        borderRadius: 2,
+                                        "& .MuiFilledInput-underline:before": {
+                                            borderBottom: "none", // Elimina la línea inferior en el estado normal
+                                        },
+                                        "& .MuiFilledInput-underline:after": {
+                                            borderBottom: "none", // Elimina la línea inferior en el estado activo/foco
+                                        },
+                                        "& .MuiFilledInput-underline:hover:before": {
+                                            borderBottom: "none", // Elimina la línea inferior al pasar el ratón por encima
+                                        },
+                                        "& .MuiFilledInput-root": {
+                                            backgroundColor: "rgba(0,0,0,0)", // Hace el fondo transparente
+                                            "&:hover": {
+                                                backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente al pasar el ratón por encima
+                                            },
+                                            "&.Mui-focused": {
+                                                backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente en el estado de foco
+                                            },
+                                        },
+                                    }}
+                                />
+                                <TextField
+                                    margin="normal"
+                                    required
+                                    fullWidth
+                                    label="Contraseña"
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    variant="filled"
+                                    sx={{
+                                        width: "100%",
+                                        backgroundColor: "#EDEDED",
+                                        borderRadius: 2,
+                                        "& .MuiFilledInput-underline:before": {
+                                            borderBottom: "none", // Elimina la línea inferior en el estado normal
+                                        },
+                                        "& .MuiFilledInput-underline:after": {
+                                            borderBottom: "none", // Elimina la línea inferior en el estado activo/foco
+                                        },
+                                        "& .MuiFilledInput-underline:hover:before": {
+                                            borderBottom: "none", // Elimina la línea inferior al pasar el ratón por encima
+                                        },
+                                        "& .MuiFilledInput-root": {
+                                            backgroundColor: "rgba(0,0,0,0)", // Hace el fondo transparente
+                                            "&:hover": {
+                                                backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente al pasar el ratón por encima
+                                            },
+                                            "&.Mui-focused": {
+                                                backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente en el estado de foco
+                                            },
+                                        },
+                                    }}
+                                />
+                                <FormControl fullWidth margin="normal">
+                                    <InputLabel>Rol</InputLabel>
+                                    <Select
+                                        value={role}
+                                        label="Rol"
+                                        onChange={(e) => setRole(e.target.value)}
+                                        variant="filled"
+                                        sx={{
+                                            width: "100%",
+                                            backgroundColor: "#EDEDED",
+                                            borderRadius: 2,
+                                            "& .MuiFilledInput-underline:before": {
+                                                borderBottom: "none", // Elimina la línea inferior en el estado normal
+                                            },
+                                            "& .MuiFilledInput-underline:after": {
+                                                borderBottom: "none", // Elimina la línea inferior en el estado activo/foco
+                                            },
+                                            "& .MuiFilledInput-underline:hover:before": {
+                                                borderBottom: "none", // Elimina la línea inferior al pasar el ratón por encima
+                                            },
+                                            "& .MuiFilledInput-root": {
+                                                backgroundColor: "rgba(0,0,0,0)", // Hace el fondo transparente
+                                                "&:hover": {
+                                                    backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente al pasar el ratón por encima
+                                                },
+                                                "&.Mui-focused": {
+                                                    backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente en el estado de foco
+                                                },
+                                            },
+                                        }}
+                                    >
+                                        <MenuItem value="taxista">Taxista</MenuItem>
+                                        <MenuItem value="usuario">Usuario</MenuItem>
+                                    </Select>
+                                </FormControl>
+                                <IconButton
+                                    color="primary"
+                                    aria-label="upload picture"
+                                    component="label"
+                                    sx={{ mt: 2 }}
+                                >
+                                    <input
+                                        hidden
+                                        accept="image/*"
+                                        type="file"
+                                        onChange={handleImageChange}
+                                    />
+                                    <PhotoCamera />
+                                </IconButton>
+                                {preview && (
+                                    <Box sx={{ mb: 2 }}>
+                                        <Avatar src={preview} sx={{ width: 100, height: 100 }} />
+                                    </Box>
+                                )}
+                                <Button
+                                    type="submit"
+                                    fullWidth
+                                    variant="contained"
+                                    sx={{
+                                        mt: 3, mb: 2,
+                                        background: "#000",
+                                        color: "#fff",
+                                        
+                                    }}
+                                    onClick={handleSignUp}
+                                >
+                                    Registrarse
+                                </Button>
+                            </CardContent>
+                        </Card>
 
-                    <Card
-                        raised
-                        sx={{
-                            background: "#fff",
-                            mx: "auto",
-                            alignContent: "center",
-                            alignItems: "center",
-                            textAlign: "center",
-                            justifyContent: "center",
-                            marginTop: 2,
-                        }}
-                    >
-                        <CardContent
+                        <Card
+                            raised
                             sx={{
-                                display: "flex",
-
+                                background: "#fff",
+                                mx: "auto",
                                 alignContent: "center",
                                 alignItems: "center",
                                 textAlign: "center",
-                                justifyContent: "space-around",
-                                p: 2,
+                                justifyContent: "center",
+                                marginTop: 2,
                             }}
                         >
-                            <Typography
-                                component="p"
-                                variant="body1"
+                            <CardContent
                                 sx={{
                                     display: "flex",
-                                    alignContent: "center",
-                                    alignItems: "center",
-                                    textAlign: "center",
-                                }}
-                            >
-                                Tinenes una cuenta?
-                            </Typography>
 
-                            <Typography
-                                onClick={() => navigate("/")}
-                                sx={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    cursor: "pointer",
-                                    color: "#292929",
                                     alignContent: "center",
+                                    alignItems: "center",
                                     textAlign: "center",
+                                    justifyContent: "space-around",
                                     p: 2,
                                 }}
                             >
-                                SignIn{" "}
-                                <ArrowForwardIosOutlined
-                                    fontSize="small"
-                                    sx={{ color: "#292929" }}
-                                />
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Box>
-            </Container>
+                                <Typography
+                                    component="p"
+                                    variant="body1"
+                                    sx={{
+                                        display: "flex",
+                                        alignContent: "center",
+                                        alignItems: "center",
+                                        textAlign: "center",
+                                    }}
+                                >
+                                    Tinenes una cuenta?
+                                </Typography>
+
+                                <Typography
+                                    onClick={() => navigate("/")}
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        cursor: "pointer",
+                                        color: "#292929",
+                                        alignContent: "center",
+                                        textAlign: "center",
+                                        p: 2,
+                                    }}
+                                >
+                                    SignIn{" "}
+                                    <ArrowForwardIosOutlined
+                                        fontSize="small"
+                                        sx={{ color: "#292929" }}
+                                    />
+                                </Typography>
+                            </CardContent>
+                        </Card>
+                    </Box>
+                </Container>
+            </Box>
+
             <Snackbar
                 open={openSnackbar}
                 autoHideDuration={6000}

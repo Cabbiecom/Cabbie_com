@@ -1,7 +1,7 @@
-import { Avatar, IconButton } from "@mui/material";
+//import { Avatar, IconButton } from "@mui/material";
 import React, { useState } from "react";
 import { useSpring, animated } from "react-spring";
-import logo from '../../Assets/images/CabbieXL.jpeg';
+//import logo from '../../Assets/images/CabbieXL.jpeg';
 import NoCrashIcon from '@mui/icons-material/NoCrash';
 const FooterAnimated = () => {
     const [toggle, setToggle] = useState(false);
