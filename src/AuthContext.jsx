@@ -1,30 +1,48 @@
-import React, { useEffect, useState } from 'react';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export const AuthContext = React.createContext();
+// Crear un contexto de autenticación
+const AuthContext = createContext();
 
+// Hook personalizado para usar el contexto de autenticación
+export const useAuth = () => useContext(AuthContext);
+
+// Componente proveedor para envolver tu aplicación o componentes
 export const AuthProvider = ({ children }) => {
-    const [currentUser, setCurrentUser] = useState(null);
-    const [pending, setPending] = useState(true);
+    const [user, setUser] = useState(null);
 
+    // Aquí puedes agregar la lógica para verificar si el usuario está logueado al cargar la aplicación.
+    // Por ejemplo, podrías verificar un token almacenado en localStorage.
     useEffect(() => {
-        const auth = getAuth();
-        onAuthStateChanged(auth, (user) => {
-            setCurrentUser(user);
-            setPending(false);
-        });
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
     }, []);
 
-    if (pending) {
-        return <>Cargando...</>
-    }
+    // Función para iniciar sesión
+    // Aquí deberías añadir la lógica para autenticar al usuario, por ejemplo, hacer una petición a tu servidor
+    const login = async (username, password) => {
+        // Simulación de inicio de sesión
+        const user = { id: 1, name: 'Usuario Demo', username };
+        localStorage.setItem('user', JSON.stringify(user));
+        setUser(user);
+    };
+
+    // Función para cerrar sesión
+    const logout = () => {
+        localStorage.removeItem('user');
+        setUser(null);
+    };
+
+    // El valor que se pasa al contexto incluye el estado del usuario y las funciones para modificarlo
+    const value = {
+        user,
+        login,
+        logout,
+    };
 
     return (
-        <AuthContext.Provider
-            value={{
-                currentUser
-            }}
-        >
+        <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     );

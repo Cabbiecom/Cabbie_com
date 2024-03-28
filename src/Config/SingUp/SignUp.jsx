@@ -158,7 +158,6 @@ const SignUp = () => {
                             raised
                             sx={{
                                 background: "#fff",
-
                                 marginTop: 10,
                             }}
                         >
@@ -304,7 +303,7 @@ const SignUp = () => {
                                     </Select>
                                 </FormControl>
                                 <IconButton
-                                    color="primary"
+                                    color="black"
                                     aria-label="upload picture"
                                     component="label"
                                     sx={{ mt: 2 }}

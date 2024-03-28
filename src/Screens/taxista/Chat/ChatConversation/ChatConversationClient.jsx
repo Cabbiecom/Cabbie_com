@@ -67,6 +67,9 @@ function ChatConversationClient() {
         setSnackbarOpen(false);
     };
 
+    //traida DE DATOS DE LAS IMAGENES QUE LOS USUSARIOS ENVIAN
+    const [images, setImages] = useState([]);
+
     //Variable con parametros
     let { taxiUserId, UsuarioId } = useParams();
     //Toma de la ruta golocalitataión
@@ -112,7 +115,7 @@ function ChatConversationClient() {
         setOpenDialog(false);
     };
 
-    const handleSendPhoto = () => {
+    const handleSendPhoto = (event) => {
         if (!imagePreview) {
             console.error("No hay imagen para previsualizar.");
             return;
@@ -138,6 +141,7 @@ function ChatConversationClient() {
                         const progress =
                             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                         console.log("Upload is " + progress + "% done");
+
                     },
                     (error) => {
                         // Manejar errores aquí
@@ -147,7 +151,9 @@ function ChatConversationClient() {
                         setSnackbarSeverity("error");
                         setSnackbarOpen(true);
                     },
+
                     () => {
+
                         // Obtiene la URL de la imagen subida y guarda el mensaje en la base de datos
                         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
                             console.log("File available at", downloadURL);
@@ -164,11 +170,14 @@ function ChatConversationClient() {
                                 imageUrl: downloadURL, // Usa la URL de la imagen como parte del mensaje
                                 timestamp: Date.now(),
                                 type: "image", // Puedes usar este campo para diferenciar mensajes de texto e imágenes
-                            });
+
+                            }).then(() => console.log("Imagen guardada en la base de datos con éxito."))
+                                .catch((error) => console.error("Error al guardar la imagen en la base de datos:", error));
 
                             // Limpia la previsualización y cierra el diálogo
                             setImagePreview(null);
                             setOpenDialog(false);
+
                         });
                     }
                 );
@@ -177,12 +186,37 @@ function ChatConversationClient() {
     };
 
 
+
     //Variables para el role
     const chatId =
         user?.uid < UsuarioId
             ? `${user?.uid}_${UsuarioId}`
             : `${UsuarioId}_${user?.uid}`;
 
+    useEffect(() => {
+        const database = getDatabase();
+        const chatRef = ref(database, `Chats/${chatId}/messages/imagesclient`);
+
+        // Escucha los cambios en la base de datos en tiempo real
+        onValue(chatRef, (snapshot) => {
+            const imagesData = snapshot.val();
+            const loadedImages = [];
+
+            for (const key in imagesData) {
+                loadedImages.push({
+                    id: key,
+                    url: imagesData[key].imageUrl, // Asegúrate de que 'imageUrl' corresponda a la clave donde guardas la URL de la imagen
+                });
+            }
+
+            setImages(loadedImages);
+        });
+
+        // No olvides limpiar tu suscripción a cambios cuando el componente se desmonte
+        return () => {
+            // código para limpiar el listener
+        };
+    }, [UsuarioId, chatId]);
     //Menu del menssage
     const handleOpenMenu = (event, message) => {
         console.log("Abriendo menú para mensaje:", message);
@@ -273,6 +307,7 @@ function ChatConversationClient() {
                 });
         }
     }, [UsuarioId, database, taxiUserId, user]);
+
     // Cargar mensajes y asegurarse de tener la información del usuario
     useEffect(() => {
         const messagesRef = dbRef(database, `Chats/${chatId}/messages`);
@@ -759,15 +794,20 @@ function ChatConversationClient() {
                                             </div>
                                         </>
                                     )}
-                                    {msg.type === "image" && (
-                                        <img src={msg.imageUrl}
-                                            alt="Imagen enviada"
-                                            style={{
-                                                maxWidth: "200px",
-                                                maxHeight: "200px",
-                                                borderRadius: "10px"
-                                            }} />
-                                    )}
+                                    {msg.senderId === user.uid && images.map((image) => (
+                                        <div onClick={(event) => handleOpenMenu(event, msg)}>
+                                            <img
+                                                key={image.id}
+                                                src={image.url}
+                                                alt="Imagen enviada"
+                                                style={{
+                                                    maxWidth: "200px",
+                                                    maxHeight: "200px",
+                                                    borderRadius: "10px"
+                                                }}
+                                            />
+                                        </div>
+                                    ))}
                                     {msg.senderId === user.uid && (
                                         <>
                                             <Avatar
@@ -785,7 +825,7 @@ function ChatConversationClient() {
                         </React.Fragment>
                     ))}
                     {imagePreview && (
-                        <div>
+                        <Box>
                             <Dialog open={openDialog} onClose={handleCloseDialog}>
                                 <DialogTitle>Enviar Foto</DialogTitle>
                                 <DialogContent>
@@ -800,7 +840,7 @@ function ChatConversationClient() {
                                     <Button onClick={handleSendPhoto}>Enviar</Button>
                                 </DialogActions>
                             </Dialog>
-                        </div>
+                        </Box>
                     )}
                 </List>
 

@@ -22,6 +22,9 @@ const SignIn = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    //EStado de la carga de inicio de sesion
+    const [loading, setLoading] = useState(false);
+
     const showAlert = (message, severity = "info") => {
         setAlertMessage(message);
         setAlertSeverity(severity);
@@ -35,8 +38,9 @@ const SignIn = () => {
     };
 
     const handleLogin = async (event) => {
-        const auth = getAuth();
         event.preventDefault();
+        const auth = getAuth();
+
         try {
             const userCredential = await signInWithEmailAndPassword(
                 auth,
@@ -44,12 +48,12 @@ const SignIn = () => {
                 password
             );
 
-            // Aquí asumimos que el inicio de sesión fue exitoso
-            showAlert("Inicio de sesión exitoso.", "success");
-
             // Llamada a la interfaz de JavaScript para notificar a la app de Android
             if (window.AndroidApp) {
                 window.AndroidApp.onSignIn(true);
+                // Aquí asumimos que el inicio de sesión fue exitoso
+                showAlert("Inicio de sesión exitoso.", "success");
+
             }
 
             // Usuario autenticado correctamente, obtener datos adicionales de Realtime Database
@@ -71,19 +75,25 @@ const SignIn = () => {
             if (snapshot.exists()) {
                 const userRole = snapshot.val().role;
                 if (userRole === "taxista") {
+                    setLoading(true);
                     navigate("/HomeTaxista");
                 } else if (userRole === "usuario") {
+                    setLoading(true);
                     navigate("/HomeScreen");
                 } else if (userRole === "admin") {
+                    setLoading(true);
                     navigate("/HomeAdmin");
                 } else {
+                    setLoading(false);
                     // Si el rol no es ni 'taxista' ni 'usuario', maneja el caso (por ejemplo, mostrando una alerta)
                     showAlert("Rol de usuario no reconocido.", "warning");
                 }
             } else {
+                setLoading(false);
                 showAlert("No se encontraron datos de usuario.", "warning");
             }
         } catch (error) {
+            setLoading(false);
             console.error("Error en el inicio de sesión:", error);
             showAlert(`Error en el inicio de sesión: ${error.message}`, "error");
 
@@ -177,7 +187,10 @@ const SignIn = () => {
                                     p: 2,
                                 }}
                             >
-                                <Box component="form" noValidate sx={{ mt: 1 }}>
+                                <Box
+                                    component="form"
+                                    noValidate sx={{ mt: 1 }}
+                                    onSubmit={handleLogin}>
                                     <TextField
                                         variant="filled"
                                         margin="normal"
@@ -254,10 +267,10 @@ const SignIn = () => {
                                         type="submit"
                                         fullWidth
                                         variant="contained"
-                                        onClick={handleLogin}
+                                        disabled={loading}
                                         sx={{ mt: 3, mb: 2, background: "#000" }}
                                     >
-                                        Iniciar sesión
+                                        {loading ? "Cargando..." : "Iniciar sesión"}
                                     </Button>
                                 </Box>
                             </CardContent>

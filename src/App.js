@@ -1,9 +1,9 @@
-import React, { useContext } from "react";
+import React from "react";
 import {
   HashRouter as Router,
   Route,
   Routes,
-  Navigate,
+
 } from "react-router-dom";
 //import logo from "./Assets/images/Cabbie.png";
 import "./App.css";
@@ -24,7 +24,6 @@ import ChatConversationClient from "./Screens/taxista/Chat/ChatConversation/Chat
 import HomeAdmin from "./Screens/Admin/Home/HomeAdmin";
 import Legal from "./Screens/Page/Legal";
 import Dashboard from "./Screens/Admin/Dashboard/Dashboard";
-import { AuthContext } from "./AuthContext";
 
 // Componente SplashScreen
 //const SplashScreen = () => (
@@ -33,17 +32,6 @@ import { AuthContext } from "./AuthContext";
 //   <p>Cargando...</p>
 // </div>
 //);
-
-const ProtectedRoute = ({ children, ...rest }) => {
-  const { currentUser } = useContext(AuthContext);
-
-  if (!currentUser) {
-    // Usuario no autenticado, redirige a la página de inicio de sesión
-    return <Navigate to="/" />;
-  }
-
-  return children;
-};
 
 // Componente App con SplashScreen y rutas
 function App() {
@@ -64,63 +52,14 @@ function App() {
         <Route path="/" exact element={<SignIn />} />
         <Route path="/SignUp" element={<SignUp />} />
         <Route path="/Legal" element={<Legal />} />
-        <Route
-          path="/HomeAdmin"
-          element={
-            <ProtectedRoute>
-              <HomeAdmin />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/HomeScreen"
-          element={
-            <ProtectedRoute>
-              <HomeScreen />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/HomeTaxista"
-          element={
-            <ProtectedRoute>
-              <HomeTaxista />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/Journey"
-          element={
-            <ProtectedRoute>
-              <Journey />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/Profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/HomeAdmin" element={<HomeAdmin />} />
+        <Route path="/HomeScreen" element={<HomeScreen />} />
+        <Route path="/HomeTaxista" element={<HomeTaxista />} />
+        <Route path="/Journey" element={<Journey />} />
+        <Route path="/Profile" element={<Profile />} />
         <Route path="/ConversationMessage" element={<ConversationMessage />} />
-        <Route
-          path="/EditProfile"
-          element={
-            <ProtectedRoute>
-              <EditProfile />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/Dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/EditProfile" element={<EditProfile />} />
+        <Route path="/Dashboard" element={<Dashboard />} />
         <Route
           path="/CallMessageConversationMessage"
           element={<CallMessageConversationMessage />}

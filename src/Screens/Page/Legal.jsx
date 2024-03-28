@@ -16,7 +16,7 @@ import { useTheme } from "@emotion/react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSpring, animated } from "react-spring";
 import { ArrowBackIos } from "@mui/icons-material";
-
+//import logo from '../../Assets/images/Cabbie.png';
 import { ReactComponent as CabbieSVG } from "./svg/security_on.svg";
 import { ReactComponent as PersonSVG } from "./svg/personal_info_re.svg";
 const Legal = () => {
