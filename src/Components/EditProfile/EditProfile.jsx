@@ -28,8 +28,16 @@ import {
   uploadBytes,
   getDownloadURL,
 } from "firebase/storage";
+import { useSpring, animated } from "react-spring";
 
 const EditProfile = () => {
+  // animation on wisget
+  const fade = useSpring({
+    from: { opacity: 0 },
+    to: { opacity: 1 },
+    config: { duration: 2000 },
+  });
+
   //Datos del ussuario
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState("");
@@ -99,98 +107,100 @@ const EditProfile = () => {
 
   return (
     <>
-      <AppBar
-        sx={{
-          background: "#000",
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-          borderBottomLeftRadius: '20px',
-          borderBottomRightRadius: '20px',
-        }}
-      >
-        <Toolbar>
+      <animated.div style={fade}>
+        <AppBar
+          sx={{
+            background: "#000",
+            zIndex: (theme) => theme.zIndex.drawer + 1,
+            borderBottomLeftRadius: '20px',
+            borderBottomRightRadius: '20px',
+          }}
+        >
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="back"
+              onClick={handleBack}
+            >
+              <ArrowBackIos fontSize="small" />
+            </IconButton>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              Editar Perfil
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Box
+          sx={{
+            height: "87vh",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            background: "#f4f4f4",
+            padding: "40px",
+            justifyContent: "center",
+            alignContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="h5">Actualizar los Datos</Typography>
           <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="back"
-            onClick={handleBack}
+            color="primary"
+            aria-label="upload picture"
+            component="label"
+            sx={{ mt: 2 }}
           >
-            <ArrowBackIos fontSize="small" />
+            <input
+              hidden
+              accept="image/*"
+              type="file"
+              onChange={handleImageChange}
+            />
+            <PhotoCamera />
           </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Editar Perfil
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Box
-        sx={{
-          height: "87vh",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          background: "#f4f4f4",
-          padding: "40px",
-          justifyContent: "center",
-          alignContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Typography variant="h5">Actualizar los Datos</Typography>
-        <IconButton
-          color="primary"
-          aria-label="upload picture"
-          component="label"
-          sx={{ mt: 2 }}
-        >
-          <input
-            hidden
-            accept="image/*"
-            type="file"
-            onChange={handleImageChange}
-          />
-          <PhotoCamera />
-        </IconButton>
-        {preview && (
-          <Box sx={{ mb: 2 }}>
-            <Avatar src={preview} sx={{ width: 100, height: 100 }} />
-          </Box>
-        )}
+          {preview && (
+            <Box sx={{ mb: 2 }}>
+              <Avatar src={preview} sx={{ width: 100, height: 100 }} />
+            </Box>
+          )}
 
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          label="Nombre"
-          autoFocus
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          label="Correo Electrónico"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          label="Contraseña"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          sx={{ mt: 3, mb: 2, background: "#000", color: "#fff" }}
-          onClick={handleUpdate}
-        >
-          Actualizar Datos
-        </Button>
-      </Box>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            label="Nombre"
+            autoFocus
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            label="Correo Electrónico"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            label="Contraseña"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2, background: "#000", color: "#fff" }}
+            onClick={handleUpdate}
+          >
+            Actualizar Datos
+          </Button>
+        </Box>
+      </animated.div>
     </>
   );
 };

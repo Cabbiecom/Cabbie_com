@@ -25,6 +25,7 @@ import { auth } from "../../../Data/Database";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { getDatabase, ref as dbRef, set, get } from "firebase/database";
 import TextFieldMaps from "../../../widget/TextFieldMaps";
+import { useSpring, animated } from "react-spring";
 
 const drawerBleeding = 56;
 
@@ -62,6 +63,12 @@ const Journey = () => {
   const [taxiUsers, setTaxiUsers] = useState([]);
   const navigate = useNavigate();
   const database = getDatabase();
+
+  const fade = useSpring({
+    from: { opacity: 0 },
+    to: { opacity: 1 },
+    config: { duration: 2000 },
+  });
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -180,107 +187,112 @@ const Journey = () => {
   };
 
   return (
-    <Root>
-      <CssBaseline />
-      <Global
-        styles={{
-          ".MuiDrawer-root > .MuiPaper-root": {
-            height: `calc(50% - ${drawerBleeding}px)`,
-            overflow: "visible",
-          },
-        }}
-      />
-      <AppBar position="fixed" sx={{
-        zIndex: (theme) => theme.zIndex.drawer + 1,
-        borderBottomLeftRadius: '20px',
-                  borderBottomRightRadius: '20px', 
-        background: "#000"
-      }}>
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            CABBIE
-          </Typography>
-          <IconButton
-            edge="end"
-            color="inherit"
-            aria-label="menu"
-            onClick={handleClick}
+    <>
+      <animated.div style={fade}>
+        <Root>
+          <CssBaseline />
+          <Global
+            styles={{
+              ".MuiDrawer-root > .MuiPaper-root": {
+                height: `calc(50% - ${drawerBleeding}px)`,
+                overflow: "visible",
+              },
+            }}
+          />
+          <AppBar position="fixed" sx={{
+            zIndex: (theme) => theme.zIndex.drawer + 1,
+            borderBottomLeftRadius: '20px',
+            borderBottomRightRadius: '20px',
+            background: "#000"
+          }}>
+            <Toolbar>
+              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                CABBIE
+              </Typography>
+              <IconButton
+                edge="end"
+                color="inherit"
+                aria-label="menu"
+                onClick={handleClick}
+              >
+                <Avatar src={photoURL} />
+              </IconButton>
+            </Toolbar>
+          </AppBar>
+          <Menu
+            open={openHandle}
+            anchorEl={anchorEl}
+            id="account-menu"
+            onClose={handleClose}
+            onClick={handleClose}
+            PaperProps={{
+              elevation: 0,
+              sx: {
+                overflow: "visible",
+                filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                mt: 1.5,
+                "& .MuiAvatar-root": {
+                  width: 32,
+                  height: 32,
+                  ml: -0.5,
+                  mr: 1,
+                },
+                "&::before": {
+                  content: '""',
+                  display: "block",
+                  position: "absolute",
+                  top: 0,
+                  right: 14,
+                  width: 10,
+                  height: 10,
+                  bgcolor: "background.paper",
+                  transform: "translateY(-50%) rotate(45deg)",
+                  zIndex: 0,
+                },
+              },
+            }}
+            transformOrigin={{ horizontal: "right", vertical: "top" }}
+            anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
           >
-            <Avatar src={photoURL} />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-      <Menu
-        open={openHandle}
-        anchorEl={anchorEl}
-        id="account-menu"
-        onClose={handleClose}
-        onClick={handleClose}
-        PaperProps={{
-          elevation: 0,
-          sx: {
-            overflow: "visible",
-            filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-            mt: 1.5,
-            "& .MuiAvatar-root": {
-              width: 32,
-              height: 32,
-              ml: -0.5,
-              mr: 1,
-            },
-            "&::before": {
-              content: '""',
-              display: "block",
-              position: "absolute",
-              top: 0,
-              right: 14,
-              width: 10,
-              height: 10,
-              bgcolor: "background.paper",
-              transform: "translateY(-50%) rotate(45deg)",
-              zIndex: 0,
-            },
-          },
-        }}
-        transformOrigin={{ horizontal: "right", vertical: "top" }}
-        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-      >
-        <MenuItem onClick={handleClose}>
-          <Avatar src={photoURL} /> {name}
-        </MenuItem>
-        <Divider />
+            <MenuItem onClick={handleClose}>
+              <Avatar src={photoURL} /> {name}
+            </MenuItem>
+            <Divider />
 
-        <MenuItem
-          onClick={() => {
-            navigate("/ChatList");
-          }}
-        >
-          <ListItemIcon>
-            <Chat fontSize="small" />
-          </ListItemIcon>
-          Chat
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            navigate("/EditProfile");
-          }}
-        >
-          <ListItemIcon>
-            <Settings fontSize="small" />
-          </ListItemIcon>
-          Settings
-        </MenuItem>
-        <MenuItem onClick={handleLogout}>
-          <ListItemIcon>
-            <Logout fontSize="small" />
-          </ListItemIcon>
-          Logout
-        </MenuItem>
-      </Menu>
-      <Box sx={{ textAlign: "center", pt: 1 }}>
-        <TextFieldMaps />
-      </Box>
-    </Root>
+            <MenuItem
+              onClick={() => {
+                navigate("/ChatList");
+              }}
+            >
+              <ListItemIcon>
+                <Chat fontSize="small" />
+              </ListItemIcon>
+              Chat
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                navigate("/EditProfile");
+              }}
+            >
+              <ListItemIcon>
+                <Settings fontSize="small" />
+              </ListItemIcon>
+              Settings
+            </MenuItem>
+            <MenuItem onClick={handleLogout}>
+              <ListItemIcon>
+                <Logout fontSize="small" />
+              </ListItemIcon>
+              Logout
+            </MenuItem>
+          </Menu>
+          <Box sx={{ textAlign: "center", pt: 1 }}>
+            <TextFieldMaps />
+          </Box>
+        </Root>
+      </animated.div>
+    </>
+
   );
 };
 

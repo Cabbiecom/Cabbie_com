@@ -25,7 +25,7 @@ import { auth } from "../../Data/Database";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { getDatabase, ref as dbRef, set, get } from "firebase/database";
 import MapCabbie from "./MapsTaxista/MapCabbie";
-
+import { useSpring, animated } from "react-spring";
 
 //import ParentComponent from "../../Controller/Controller";
 
@@ -42,6 +42,12 @@ const HomeTaxista = () => {
   //variables de accion toogle
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const fade = useSpring({
+    from: { opacity: 0 },
+    to: { opacity: 1 },
+    config: { duration: 2000 },
+  });
 
   const openHandle = Boolean(anchorEl);
 
@@ -97,99 +103,102 @@ const HomeTaxista = () => {
 
   return (
     <>
-      <AppBar position="fixed" sx={{
-        zIndex: (theme) => theme.zIndex.drawer + 1,
-        borderBottomLeftRadius: '20px',
-        borderBottomRightRadius: '20px',
-        background: "#000"
-      }}>
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            CABBIE
-          </Typography>
-          <IconButton
-            edge="end"
-            color="inherit"
-            aria-label="menu"
-            onClick={handleClick}
+      <animated.div style={fade}>
+        <AppBar position="fixed" sx={{
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          borderBottomLeftRadius: '20px',
+          borderBottomRightRadius: '20px',
+          background: "#000"
+        }}>
+          <Toolbar>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              CABBIE
+            </Typography>
+            <IconButton
+              edge="end"
+              color="inherit"
+              aria-label="menu"
+              onClick={handleClick}
+            >
+              <Avatar src={photoURL} />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+        <Menu
+          open={openHandle}
+          anchorEl={anchorEl}
+          id="account-menu"
+          onClose={handleClose}
+          onClick={handleClose}
+          PaperProps={{
+            elevation: 0,
+            sx: {
+              overflow: "visible",
+              filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+              mt: 1.5,
+              "& .MuiAvatar-root": {
+                width: 32,
+                height: 32,
+                ml: -0.5,
+                mr: 1,
+              },
+              "&::before": {
+                content: '""',
+                display: "block",
+                position: "absolute",
+                top: 0,
+                right: 14,
+                width: 10,
+                height: 10,
+                bgcolor: "background.paper",
+                transform: "translateY(-50%) rotate(45deg)",
+                zIndex: 0,
+              },
+            },
+          }}
+          transformOrigin={{ horizontal: "right", vertical: "top" }}
+          anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+        >
+          <MenuItem onClick={handleClose}>
+            <Avatar src={photoURL} /> {name}
+          </MenuItem>
+          <Divider />
+          <MenuItem onClick={handleOpenDrawer}>
+            <ListItemIcon>
+              <SosOutlined fontSize="small" />
+            </ListItemIcon>
+            Emergencia
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              navigate("/ChatList");
+            }}
           >
-            <Avatar src={photoURL} />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-      <Menu
-        open={openHandle}
-        anchorEl={anchorEl}
-        id="account-menu"
-        onClose={handleClose}
-        onClick={handleClose}
-        PaperProps={{
-          elevation: 0,
-          sx: {
-            overflow: "visible",
-            filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-            mt: 1.5,
-            "& .MuiAvatar-root": {
-              width: 32,
-              height: 32,
-              ml: -0.5,
-              mr: 1,
-            },
-            "&::before": {
-              content: '""',
-              display: "block",
-              position: "absolute",
-              top: 0,
-              right: 14,
-              width: 10,
-              height: 10,
-              bgcolor: "background.paper",
-              transform: "translateY(-50%) rotate(45deg)",
-              zIndex: 0,
-            },
-          },
-        }}
-        transformOrigin={{ horizontal: "right", vertical: "top" }}
-        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-      >
-        <MenuItem onClick={handleClose}>
-          <Avatar src={photoURL} /> {name}
-        </MenuItem>
-        <Divider />
-        <MenuItem onClick={handleOpenDrawer}>
-          <ListItemIcon>
-            <SosOutlined fontSize="small" />
-          </ListItemIcon>
-          Emergencia
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            navigate("/ChatList");
-          }}
-        >
-          <ListItemIcon>
-            <Chat fontSize="small" />
-          </ListItemIcon>
-          Chat
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            navigate("/EditProfile");
-          }}
-        >
-          <ListItemIcon onClick={() => { }}>
-            <Settings fontSize="small" />
-          </ListItemIcon>
-          Configuraciones
-        </MenuItem>
-        <MenuItem onClick={handleLogout}>
-          <ListItemIcon>
-            <Logout fontSize="small" />
-          </ListItemIcon>
-          Cerrar Sesión
-        </MenuItem>
-      </Menu>
-      <MapCabbie />
+            <ListItemIcon>
+              <Chat fontSize="small" />
+            </ListItemIcon>
+            Chat
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              navigate("/EditProfile");
+            }}
+          >
+            <ListItemIcon onClick={() => { }}>
+              <Settings fontSize="small" />
+            </ListItemIcon>
+            Configuraciones
+          </MenuItem>
+          <MenuItem onClick={handleLogout}>
+            <ListItemIcon>
+              <Logout fontSize="small" />
+            </ListItemIcon>
+            Cerrar Sesión
+          </MenuItem>
+        </Menu>
+        <MapCabbie />
+      </animated.div>
+
     </>
   );
 };

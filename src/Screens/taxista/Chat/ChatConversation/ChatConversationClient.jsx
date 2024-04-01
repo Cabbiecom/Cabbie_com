@@ -53,9 +53,16 @@ import {
     getDownloadURL,
 } from "firebase/storage";
 import { remove } from 'firebase/database';
-
+import { useSpring, animated } from "react-spring";
 
 function ChatConversationClient() {
+    // animation on wisget
+    const fade = useSpring({
+        from: { opacity: 0 },
+        to: { opacity: 1 },
+        config: { duration: 2000 },
+    });
+
     //controla la visibilidad
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -608,343 +615,353 @@ function ChatConversationClient() {
 
     return (
         <>
-            <CssBaseline />
-            <AppBar
-                position="fixed"
-                sx={{
-                    zIndex: (theme) => theme.zIndex.drawer + 1,
-                    borderBottomLeftRadius: "20px",
-                    borderBottomRightRadius: "20px",
-                    background: "black",
-                    visibility: "visible",
-                    display: "-moz-initial",
-                }}
-            >
-                {usersInfo && (
-                    <Toolbar>
-                        <IconButton
-                            edge="start"
-                            color="inherit"
-                            aria-label="menu"
-                            onClick={() => navigate(-1)}
-                        >
-                            <ArrowBackIcon />
-                        </IconButton>
-                        <Avatar src={usersInfo.imageUrl} alt={usersInfo.name} />
-                        <Typography
-                            variant="h6"
-                            noWrap
-                            component="div"
-                            sx={{
-                                flexGrow: 1,
-                                ml: 1,
-                                color: "#fff",
-                            }}
-                        >
-                            {usersInfo.name}
-                        </Typography>
-                        {/* Íconos a la derecha */}
-                        <IconButton
-                            color="inherit"
-                            onClick={() => {
-                                navigate("/CallMessageConversationMessage");
-                            }}
-                        >
-                            <PhoneIcon />
-                        </IconButton>
-                        <IconButton color="inherit">
-                            <VideocamIcon />
-                        </IconButton>
+            <animated.div style={fade}>
 
-                        <IconButton color="inherit" onClick={handleClick}>
-                            <MoreVertIcon />
-                        </IconButton>
-                    </Toolbar>
-                )}
-                <Menu
-                    anchorEl={anchorEl}
-                    id="account-menu"
-                    open={openHandle}
-                    onClose={handleClose}
-                    onClick={handleClose}
-                    PaperProps={{
-                        elevation: 0,
-                        sx: {
-                            overflow: "visible",
-                            filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-                            mt: 1.5,
-                            "& .MuiAvatar-root": {
-                                width: 32,
-                                height: 32,
-                                ml: -0.5,
-                                mr: 1,
-                            },
-                            "&::before": {
-                                content: '""',
-                                display: "block",
-                                position: "absolute",
-                                top: 0,
-                                right: 14,
-                                width: 10,
-                                height: 10,
-                                bgcolor: "background.paper",
-                                transform: "translateY(-50%) rotate(45deg)",
-                                zIndex: 0,
-                            },
-                        },
+                <AppBar
+                    position="fixed"
+                    sx={{
+                        zIndex: (theme) => theme.zIndex.drawer + 1,
+                        borderBottomLeftRadius: "20px",
+                        borderBottomRightRadius: "20px",
+                        background: "black",
+                        visibility: "visible",
+                        display: "-moz-initial",
                     }}
-                    transformOrigin={{ horizontal: "right", vertical: "top" }}
-                    anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
                 >
-                    <MenuItem onClick={handleClose}>Ver Contacto</MenuItem>
-                    <Divider />
-                    <MenuItem onClick={() => { }}>Buscar</MenuItem>
-                    <MenuItem onClick={handleClose}>Vaciar chat</MenuItem>
-
-                    <MenuItem onClick={handleClose}>Fondo de pantalla</MenuItem>
-                    <MenuItem onClick={handleClose}>Mensajes Temporales</MenuItem>
-                </Menu>
-            </AppBar>
-            <Toolbar />
-            <Snackbar
-                open={snackbarOpen}
-                autoHideDuration={6000}
-                onClose={handleCloseSnackbar}
-            >
-                <Alert
-                    onClose={handleCloseSnackbar}
-                    severity={snackbarSeverity}
-                    sx={{ width: "100%" }}
-                >
-                    {snackbarMessage}
-                </Alert>
-            </Snackbar>
-
-            <Box
-                sx={{
-                    mt: 1,
-                    mb: 2,
-                    px: 2,
-                    overflow: "auto",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-end",
-                }}
-            >
-                <List sx={{ width: "100%" }}>
-                    {messages.map((msg, index) => (
-                        // Encuentra la información del usuario basado en msg.senderId
-                        <React.Fragment key={msg.id || index}>
-                            <div
-                                style={{
-                                    display: "flex",
-                                    justifyContent:
-                                        msg.senderId === user.uid ? "flex-end" : "flex-start",
-                                    gap: "20px",
+                    {usersInfo && (
+                        <Toolbar>
+                            <IconButton
+                                edge="start"
+                                color="inherit"
+                                aria-label="menu"
+                                onClick={() => navigate(-1)}
+                            >
+                                <ArrowBackIcon />
+                            </IconButton>
+                            <Avatar src={usersInfo.imageUrl} alt={usersInfo.name} />
+                            <Typography
+                                variant="h6"
+                                noWrap
+                                component="div"
+                                sx={{
+                                    flexGrow: 1,
+                                    ml: 1,
+                                    color: "#fff",
                                 }}
                             >
+                                {usersInfo.name}
+                            </Typography>
+                            {/* Íconos a la derecha */}
+                            <IconButton
+                                color="inherit"
+                                onClick={() => {
+                                    navigate("/CallMessageConversationMessage");
+                                }}
+                            >
+                                <PhoneIcon />
+                            </IconButton>
+                            <IconButton color="inherit">
+                                <VideocamIcon />
+                            </IconButton>
 
-                                <>
-                                    {msg.senderId !== user.uid &&
-                                        // Asegúrate de que tienes información del remitente antes de intentar mostrarla
-                                        (participantsInfo[msg.senderId] ? (
-                                            <Avatar
-                                                src={participantsInfo[msg.senderId].imageUrl}
-                                                alt={
-                                                    participantsInfo[msg.senderId].name ||
-                                                    "Nombre Desconocido"
-                                                }
-                                            />
-                                        ) : (
-                                            <Avatar
-                                                src={usersInfo?.imageUrl}
-                                                alt={usersInfo?.name || "Nombre Desconocido"}
-                                            />
-                                        ))}
-                                    {msg.type === "location" && msg.imageUrl ? (
-                                        <>
-                                            <div
-                                                style={{
-                                                    cursor: "pointer",
-                                                    maxWidth: "80%",
-                                                    alignSelf: msg.senderId === user.uid ? "flex-start" : "flex-end",
-                                                }}
-                                                onClick={() => window.open(msg.link, "_blank")}
-                                            >
-                                                <Typography variant="body2" color="textSecondary">
-                                                    Ruta desde {originAddress} a {destinationAddress}
-                                                </Typography>
-                                                <img
-                                                    src={msg.imageUrl}
-                                                    alt="Mapa de la ruta"
+                            <IconButton color="inherit" onClick={handleClick}>
+                                <MoreVertIcon />
+                            </IconButton>
+                        </Toolbar>
+                    )}
+                    <Menu
+                        anchorEl={anchorEl}
+                        id="account-menu"
+                        open={openHandle}
+                        onClose={handleClose}
+                        onClick={handleClose}
+                        PaperProps={{
+                            elevation: 0,
+                            sx: {
+                                overflow: "visible",
+                                filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                                mt: 1.5,
+                                "& .MuiAvatar-root": {
+                                    width: 32,
+                                    height: 32,
+                                    ml: -0.5,
+                                    mr: 1,
+                                },
+                                "&::before": {
+                                    content: '""',
+                                    display: "block",
+                                    position: "absolute",
+                                    top: 0,
+                                    right: 14,
+                                    width: 10,
+                                    height: 10,
+                                    bgcolor: "background.paper",
+                                    transform: "translateY(-50%) rotate(45deg)",
+                                    zIndex: 0,
+                                },
+                            },
+                        }}
+                        transformOrigin={{ horizontal: "right", vertical: "top" }}
+                        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+                    >
+                        <MenuItem onClick={handleClose}>Ver Contacto</MenuItem>
+                        <Divider />
+                        <MenuItem onClick={() => { }}>Buscar</MenuItem>
+                        <MenuItem onClick={handleClose}>Vaciar chat</MenuItem>
+
+                        <MenuItem onClick={handleClose}>Fondo de pantalla</MenuItem>
+                        <MenuItem onClick={handleClose}>Mensajes Temporales</MenuItem>
+                    </Menu>
+                </AppBar>
+                <Toolbar />
+                <Snackbar
+                    open={snackbarOpen}
+                    autoHideDuration={6000}
+                    onClose={handleCloseSnackbar}
+                >
+                    <Alert
+                        onClose={handleCloseSnackbar}
+                        severity={snackbarSeverity}
+                        sx={{ width: "100%" }}
+                    >
+                        {snackbarMessage}
+                    </Alert>
+                </Snackbar>
+
+                <Box
+                    sx={{
+                        mt: 1,
+                        mb: 2,
+                        px: 2,
+                        overflow: "auto",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "flex-end",
+                    }}
+                >
+                    <List sx={{ width: "100%" }}>
+                        {messages.map((msg, index) => (
+                            // Encuentra la información del usuario basado en msg.senderId
+                            <React.Fragment key={msg.id || index}>
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        justifyContent:
+                                            msg.senderId === user.uid ? "flex-end" : "flex-start",
+                                        gap: "20px",
+                                    }}
+                                >
+
+                                    <>
+                                        {msg.senderId !== user.uid &&
+                                            // Asegúrate de que tienes información del remitente antes de intentar mostrarla
+                                            (participantsInfo[msg.senderId] ? (
+                                                <Avatar
+                                                    src={participantsInfo[msg.senderId].imageUrl}
+                                                    alt={
+                                                        participantsInfo[msg.senderId].name ||
+                                                        "Nombre Desconocido"
+                                                    }
+                                                />
+                                            ) : (
+                                                <Avatar
+                                                    src={usersInfo?.imageUrl}
+                                                    alt={usersInfo?.name || "Nombre Desconocido"}
+                                                />
+                                            ))}
+                                        {msg.type === "location" && msg.imageUrl ? (
+                                            <>
+                                                <div
                                                     style={{
-                                                        width: "200px",
-                                                        height: "20vh", borderRadius: "20px"
+                                                        cursor: "pointer",
+                                                        maxWidth: "80%",
+                                                        alignSelf: msg.senderId === user.uid ? "flex-start" : "flex-end",
+                                                    }}
+                                                    onClick={() => window.open(msg.link, "_blank")}
+                                                >
+                                                    <Typography variant="body2" color="textSecondary">
+                                                        Ruta desde {originAddress} a {destinationAddress}
+                                                    </Typography>
+                                                    <img
+                                                        src={msg.imageUrl}
+                                                        alt="Mapa de la ruta"
+                                                        style={{
+                                                            width: "200px",
+                                                            height: "20vh", borderRadius: "20px"
+                                                        }}
+                                                    />
+                                                    <Typography variant="body2" color="textSecondary">
+                                                        {msg.time}, Toque para ver detalles
+                                                    </Typography>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div onClick={(event) => handleOpenMenu(event, msg)}>
+                                                    <MessageText msg={msg} userUid={user.uid} participantsInfo={participantsInfo} />
+                                                </div>
+                                            </>
+                                        )}
+                                        {msg.senderId === user.uid && images.map((image) => (
+                                            <div style={{
+                                                bgcolor:
+                                                    msg.senderId === user.uid ? "#808080" : "#f0f0f0",
+                                                color: msg.senderId === user.uid ? "#fff" : "#000",
+                                                cursor: "pointer",
+                                                maxWidth: "80%",
+                                                alignSelf: msg.senderId === user.uid ? "flex-start" : "flex-end",
+                                            }}
+                                                onClick={(event) => handleOpenMenu(event, msg)}>
+                                                <img
+                                                    key={image.id}
+                                                    src={image.url}
+                                                    alt="Imagen enviada"
+                                                    style={{
+                                                        maxWidth: "200px",
+                                                        maxHeight: "200px",
+                                                        borderRadius: "10px"
                                                     }}
                                                 />
-                                                <Typography variant="body2" color="textSecondary">
-                                                    {msg.time}, Toque para ver detalles
-                                                </Typography>
                                             </div>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <div onClick={(event) => handleOpenMenu(event, msg)}>
-                                                <MessageText msg={msg} userUid={user.uid} participantsInfo={participantsInfo} />
-                                            </div>
-                                        </>
-                                    )}
-                                    {msg.senderId === user.uid && images.map((image) => (
-                                        <div onClick={(event) => handleOpenMenu(event, msg)}>
-                                            <img
-                                                key={image.id}
-                                                src={image.url}
-                                                alt="Imagen enviada"
-                                                style={{
-                                                    maxWidth: "200px",
-                                                    maxHeight: "200px",
-                                                    borderRadius: "10px"
-                                                }}
-                                            />
-                                        </div>
-                                    ))}
-                                    {msg.senderId === user.uid && (
-                                        <>
-                                            <Avatar
-                                                src={usersInfo[msg.senderId]?.imageUrl || logo}
-                                                alt={
-                                                    usersInfo[msg.senderId]?.name ||
-                                                    "Nombre Desconocido"
-                                                }
-                                            />
-                                        </>
-                                    )}
-                                </>
+                                        ))}
+                                        {msg.senderId === user.uid && (
+                                            <>
+                                                <Avatar
+                                                    src={usersInfo[msg.senderId]?.imageUrl || logo}
+                                                    alt={
+                                                        usersInfo[msg.senderId]?.name ||
+                                                        "Nombre Desconocido"
+                                                    }
+                                                />
+                                            </>
+                                        )}
+                                    </>
 
-                            </div>
-                        </React.Fragment>
-                    ))}
-                    {imagePreview && (
-                        <Box>
-                            <Dialog open={openDialog} onClose={handleCloseDialog}>
-                                <DialogTitle>Enviar Foto</DialogTitle>
-                                <DialogContent>
-                                    <Avatar
-                                        src={imagePreview}
-                                        alt="Previsualización"
-                                        sx={{ width: 100, height: 100, mx: "auto" }}
-                                    />
-                                </DialogContent>
-                                <DialogActions>
-                                    <Button onClick={handleCloseDialog}>Cancelar</Button>
-                                    <Button onClick={handleSendPhoto}>Enviar</Button>
-                                </DialogActions>
-                            </Dialog>
-                        </Box>
-                    )}
-                </List>
+                                </div>
+                            </React.Fragment>
+                        ))}
+                        {imagePreview && (
+                            <Box>
+                                <Dialog open={openDialog} onClose={handleCloseDialog}>
+                                    <DialogTitle>Enviar Foto</DialogTitle>
+                                    <DialogContent>
+                                        <Avatar
+                                            src={imagePreview}
+                                            alt="Previsualización"
+                                            sx={{ width: 100, height: 100, mx: "auto" }}
+                                        />
+                                    </DialogContent>
+                                    <DialogActions>
+                                        <Button onClick={handleCloseDialog}>Cancelar</Button>
+                                        <Button onClick={handleSendPhoto}>Enviar</Button>
+                                    </DialogActions>
+                                </Dialog>
+                            </Box>
+                        )}
+                    </List>
 
-                <br />
-                <br />
-                <Menu
-                    anchorEl={anchorElMenu}
-                    open={Boolean(anchorElMenu)}
-                    onClose={handleCloseMenu}
-                >
-                    {/* Aquí se mapean las opciones del menú con sus respectivos íconos */}
-                    <MenuItem onClick={() => handleMenuAction("delete")}>
-                        Delete
-                    </MenuItem>
-                    {/* Agrega más opciones de menú según necesites */}
-                </Menu>
-            </Box>
+                    <br />
+                    <br />
+                    <Menu
+                        anchorEl={anchorElMenu}
+                        open={Boolean(anchorElMenu)}
+                        onClose={handleCloseMenu}
+                    >
+                        {/* Aquí se mapean las opciones del menú con sus respectivos íconos */}
+                        <MenuItem onClick={() => handleMenuAction("delete")}>
+                            Delete
+                        </MenuItem>
+                        {/* Agrega más opciones de menú según necesites */}
+                    </Menu>
+                </Box>
 
-            <Box
-                sx={{
-                    position: "fixed",
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                }}
-            >
-                {isEmojiPickerOpen && <EmojiPicker onEmojiClick={handleEmojiClick} />}
-                <TextField
-                    fullWidth
-                    variant="filled"
-                    placeholder="Escribe un mensaje..."
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
+                <Box
                     sx={{
-                        ".MuiFilledInput-root": {
-                            backgroundColor: "#000",
-                            color: "#fff",
-                            "&:hover": {
-                                backgroundColor: "#000", // Mantiene el color de fondo al pasar el mouse
-                            },
-                            "&.Mui-focused": {
-                                backgroundColor: "#000", // Mantiene el color de fondo al enfocar
-                            },
-                            "input:valid + fieldset": {
-                                borderColor: "transparent", // Elimina el borde al validar (para variantes no filled)
-                            },
-                            "input:invalid + fieldset": {
-                                borderColor: "transparent", // Elimina el borde al invalidar (para variantes no filled)
-                            },
-                            "input:valid:focus + fieldset": {
-                                borderColor: "transparent", // Elimina el borde al enfocar y validar (para variantes no filled)
-                            },
-                            "&:after": {
-                                borderBottomColor: "transparent", // Elimina la línea de enfoque para la variante filled
-                            },
-                            "&:before": {
-                                borderBottomColor: "transparent", // Elimina la línea antes de enfocar para la variante filled
-                            },
-                        },
+                        position: "fixed",
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
                     }}
-                    InputProps={{
-                        disableUnderline: true,
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <IconButton onClick={toggleEmojiPicker}>
-                                    <InsertEmoticonIcon sx={{ color: "#fff" }} />
-                                </IconButton>
-                            </InputAdornment>
-                        ),
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                <IconButton onClick={() => { }}>
-                                    <AttachFileIcon sx={{ color: "#fff" }} />
-                                </IconButton>
-
-                                <input
-                                    accept="image/*"
-                                    capture="environment" // Esto sugiere al navegador que use la cámara trasera en dispositivos móviles
-                                    style={{ display: "none" }}
-                                    id="icon-button-file"
-                                    type="file"
-                                    onChange={handleCapture}
-                                />
-                                <label htmlFor="icon-button-file">
-                                    <IconButton component="span">
-                                        <CameraAltIcon sx={{ color: "#fff" }} />
+                >
+                    {isEmojiPickerOpen && <EmojiPicker onEmojiClick={handleEmojiClick} />}
+                    <TextField
+                        fullWidth
+                        variant="filled"
+                        placeholder="Escribe un mensaje..."
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        sx={{
+                            ".MuiFilledInput-root": {
+                                backgroundColor: "#000",
+                                color: "#fff",
+                                "&:hover": {
+                                    backgroundColor: "#000", // Mantiene el color de fondo al pasar el mouse
+                                },
+                                "&.Mui-focused": {
+                                    backgroundColor: "#000", // Mantiene el color de fondo al enfocar
+                                },
+                                "input:valid + fieldset": {
+                                    borderColor: "transparent", // Elimina el borde al validar (para variantes no filled)
+                                },
+                                "input:invalid + fieldset": {
+                                    borderColor: "transparent", // Elimina el borde al invalidar (para variantes no filled)
+                                },
+                                "input:valid:focus + fieldset": {
+                                    borderColor: "transparent", // Elimina el borde al enfocar y validar (para variantes no filled)
+                                },
+                                "&:after": {
+                                    borderBottomColor: "transparent", // Elimina la línea de enfoque para la variante filled
+                                },
+                                "&:before": {
+                                    borderBottomColor: "transparent", // Elimina la línea antes de enfocar para la variante filled
+                                },
+                            },
+                        }}
+                        InputProps={{
+                            disableUnderline: true,
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <IconButton onClick={toggleEmojiPicker}>
+                                        <InsertEmoticonIcon sx={{ color: "#fff" }} />
                                     </IconButton>
-                                </label>
-                                <IconButton>
-                                    {message ? (
-                                        <IconButton onClick={handleSendMessage}>
-                                            <SendIcon sx={{ color: "#fff" }} />
+                                </InputAdornment>
+                            ),
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton onClick={() => { }}>
+                                        <AttachFileIcon sx={{ color: "#fff" }} />
+                                    </IconButton>
+
+                                    <input
+                                        accept="image/*"
+                                        capture="environment" // Esto sugiere al navegador que use la cámara trasera en dispositivos móviles
+                                        style={{ display: "none" }}
+                                        id="icon-button-file"
+                                        type="file"
+                                        onChange={handleCapture}
+                                    />
+                                    <label htmlFor="icon-button-file">
+                                        <IconButton component="span">
+                                            <CameraAltIcon sx={{ color: "#fff" }} />
                                         </IconButton>
-                                    ) : (
-                                        <IconButton onClick={() => { }}>
-                                            <MicIcon sx={{ color: "#fff" }} />
-                                        </IconButton>
-                                    )}
-                                </IconButton>
-                            </InputAdornment>
-                        ),
-                    }}
-                />
-            </Box>
+                                    </label>
+                                    <IconButton>
+                                        {message ? (
+                                            <IconButton onClick={handleSendMessage}>
+                                                <SendIcon sx={{ color: "#fff" }} />
+                                            </IconButton>
+                                        ) : (
+                                            <IconButton onClick={() => { }}>
+                                                <MicIcon sx={{ color: "#fff" }} />
+                                            </IconButton>
+                                        )}
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        }}
+                    />
+                </Box>
+            </animated.div>
         </>
     );
 }

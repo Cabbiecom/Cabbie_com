@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  HashRouter as Router,
-  Route,
-  Routes,
-
-} from "react-router-dom";
+import { HashRouter as Router, Route, Routes } from "react-router-dom";
 //import logo from "./Assets/images/Cabbie.png";
 import "./App.css";
 import HomeScreen from "./Screens/Cliente/Home/HomeScreen";
