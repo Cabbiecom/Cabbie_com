@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
 //import logo from "./Assets/images/Cabbie.png";
 import "./App.css";
@@ -19,51 +19,60 @@ import ChatConversationClient from "./Screens/taxista/Chat/ChatConversation/Chat
 import HomeAdmin from "./Screens/Admin/Home/HomeAdmin";
 import Legal from "./Screens/Page/Legal";
 import Dashboard from "./Screens/Admin/Dashboard/Dashboard";
+import { getAuth } from "firebase/auth";
+import { Navigate, Outlet } from "react-router-dom";
 
-// Componente SplashScreen
-//const SplashScreen = () => (
-// <div className="App-header">
-//   <img src={logo} className="App-logo" alt="logo" />
-//   <p>Cargando...</p>
-// </div>
-//);
+const AuthCheck = () => {
+  //constante para validar el inicio activo
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
 
-// Componente App con SplashScreen y rutas
+  useEffect(() => {
+    const auth = getAuth();
+    auth.onAuthStateChanged((user) => {
+      setIsAuthenticated(!!user);
+      setIsChecking(false);
+    });
+  }, []);
+
+  if (isChecking) {
+    // Opcional: Renderiza algún componente de carga mientras se verifica la autenticación
+    return <div>Verificando autenticación...</div>;
+  }
+
+  return isAuthenticated ? <Outlet /> : <Navigate to="/" replace />;
+};
+
 function App() {
-  //const [loading, setLoading] = useState(true);
-
-  //useEffect(() => {
-  //  const timer = setTimeout(() => setLoading(false), 3000); // Muestra el SplashScreen durante 3 segundos
-  //  return () => clearTimeout(timer);
-  // }, []);
-
-  // if (loading) {
-  //  return <SplashScreen />;
-  //}
-
   return (
     <Router>
       <Routes>
         <Route path="/" exact element={<SignIn />} />
         <Route path="/SignUp" element={<SignUp />} />
         <Route path="/Legal" element={<Legal />} />
-        <Route path="/HomeAdmin" element={<HomeAdmin />} />
-        <Route path="/HomeScreen" element={<HomeScreen />} />
-        <Route path="/HomeTaxista" element={<HomeTaxista />} />
-        <Route path="/Journey" element={<Journey />} />
-        <Route path="/Profile" element={<Profile />} />
-        <Route path="/ConversationMessage" element={<ConversationMessage />} />
-        <Route path="/EditProfile" element={<EditProfile />} />
-        <Route path="/Dashboard" element={<Dashboard />} />
-        <Route
-          path="/CallMessageConversationMessage"
-          element={<CallMessageConversationMessage />}
-        />
 
-        <Route path="/ChatList" element={<ChatList />} />
-        <Route path="/ChatMessage" element={<ChatMessage />} />
-        <Route path="chat/:UsuarioId" element={<ChatConversationClient />} />
-        <Route path="/chat/:chatId" element={<TaxiChatComponent />} />
+        <Route element={<AuthCheck />}>
+          <Route path="/HomeAdmin" element={<HomeAdmin />} />
+          <Route path="/HomeScreen" element={<HomeScreen />} />
+          <Route path="/HomeTaxista" element={<HomeTaxista />} />
+
+          <Route path="/Profile" element={<Profile />} />
+          <Route
+            path="/ConversationMessage"
+            element={<ConversationMessage />}
+          />
+          <Route path="/EditProfile" element={<EditProfile />} />
+          <Route path="/Dashboard" element={<Dashboard />} />
+          <Route
+            path="/CallMessageConversationMessage"
+            element={<CallMessageConversationMessage />}
+          />
+
+          <Route path="/ChatList" element={<ChatList />} />
+          <Route path="/ChatMessage" element={<ChatMessage />} />
+          <Route path="chat/:UsuarioId" element={<ChatConversationClient />} />
+          <Route path="/chat/:chatId" element={<TaxiChatComponent />} />
+        </Route>
       </Routes>
     </Router>
   );
