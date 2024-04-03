@@ -14,6 +14,10 @@ import {
     Card,
     CardContent,
     Button,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
 } from "@mui/material";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
@@ -96,6 +100,10 @@ const TextFieldMaps = () => {
     const navigate = useNavigate();
     const database = getDatabase();
 
+    //constante de la distancia
+    const [distance, setDistance] = useState(null); // Añade esto al estado de tu componente
+
+
     // Constantes para la Conexión Taxista
     const [taxiUsers, setTaxiUsers] = useState([]);
     const [selectedTaxiUserIndex, setSelectedTaxiUserIndex] = useState(null);
@@ -111,6 +119,9 @@ const TextFieldMaps = () => {
     const [destinationAddress, setDestinationAddress] = useState("");
     const [originSearchBox, setOriginSearchBox] = useState(null);
     const [destinationSearchBox, setDestinationSearchBox] = useState(null);
+
+    // constantes de precio
+    const [Precio, setPrecio] = useState("");
 
     // Constatntes de Destino del renderizado
     const [directionsResponse, setDirectionsResponse] = useState(null);
@@ -128,12 +139,19 @@ const TextFieldMaps = () => {
     // Renderizado del mapa de google
     const mapRef = useRef(null);
 
-
     const onMapLoad = useCallback((map) => {
         mapRef.current = map;
     }, []);
 
     // Calculo de la ruta en el Mapa
+    function showDistance(distance) {
+        // Suponiendo que tienes un elemento en tu HTML con id="distanceDisplay"
+        // const distanceDisplay = document.getElementById("distanceDisplay");
+
+        // Actualiza el contenido del elemento con la distancia
+        setDistance(`${distance} km`);
+    }
+
     const calculateRoute = async () => {
         if (originAddress === "" || destinationAddress === "") {
             return;
@@ -145,6 +163,22 @@ const TextFieldMaps = () => {
             travelMode: google.maps.TravelMode.DRIVING,
         });
         setDirectionsResponse(results);
+        // Asumiendo que la respuesta es válida y tiene al menos una ruta
+        if (results.routes.length > 0) {
+            const route = results.routes[0];
+
+            // Sumamos la distancia de todos los segmentos de la ruta
+            let totalDistance = 0;
+            route.legs.forEach((leg) => {
+                totalDistance += leg.distance.value; // La distancia viene en metros
+            });
+
+            totalDistance = totalDistance / 1000; // Convertimos metros a kilómetros
+
+            // Imaginemos que tienes una función `showDistance` que actualiza tu UI
+            // con la distancia. Puedes reemplazar esta función con lo que necesites.
+            showDistance(totalDistance.toFixed(2)); // Mostramos la distancia con 2 decimales
+        }
     };
 
     const onOriginPlacesChanged = () => {
@@ -164,6 +198,7 @@ const TextFieldMaps = () => {
             }
         }
     };
+
     // Funcion toogle
     const [BoxVisible, setBoxVisible] = useState(true);
 
@@ -195,9 +230,7 @@ const TextFieldMaps = () => {
         }
     };
 
-    const HandleNavegateCalling = () => {
-        navigate("/CallMessageConversationMessage");
-    };
+
 
     const handleVerMapsClick = () => {
         setMapVisible(true);
@@ -215,7 +248,6 @@ const TextFieldMaps = () => {
         if (selectedTaxiUserIndex !== null) {
             const selectedTaxiUser = taxiUsers[selectedTaxiUserIndex];
             if (selectedTaxiUser) {
-
                 // Navega y pasa el estado adicional
                 navigate(`/chat/${selectedTaxiUser.uid}`, {
                     state: { originAddress, destinationAddress },
@@ -569,6 +601,7 @@ const TextFieldMaps = () => {
                             {directionsResponse && (
                                 <DirectionsRenderer directions={directionsResponse} />
                             )}
+
                             {taxiUsers.map((taxiUser, index) => {
                                 // Verifica primero si el objeto `ubicacion` o `ubication` existe
                                 const lat = parseFloat(
@@ -658,9 +691,12 @@ const TextFieldMaps = () => {
                                     sx={{
                                         background:
                                             selectedTaxiUserIndex === index ? "#808080" : "#fff",
-                                        borderRadius: 1,
+                                        borderRadius: 2,
                                         mb: 1,
                                         cursor: "pointer",
+                                        width: '100%',
+                                        display: 'flex',
+                                        justifyContent: 'space-between'
                                     }}
                                     onClick={() => selectTaxiUser(index)}
                                 >
@@ -680,35 +716,71 @@ const TextFieldMaps = () => {
                                         primary={taxiUser.name}
                                         secondary={generateRating(taxiUser.rating)}
                                     />
-                                    <ListItemIcon
-                                        sx={{
-                                            display: "flex",
-                                            justifyContent: "space-between",
-                                        }}
-                                    >
-                                        <IconButton
-                                            edge="end"
-                                            onClick={HandleLocation}
-                                            sx={{ color: "red", marginRight: "4px" }}
-                                        >
-                                            <LocationOnOutlined />
-                                        </IconButton>
-                                        <IconButton
-                                            edge="end"
-                                            onClick={HandleNavegateComponents}
-                                            sx={{ color: "black", marginRight: "4px" }}
-                                        >
-                                            <ChatIcon />
-                                        </IconButton>
 
-                                        <IconButton
-                                            edge="end"
-                                            onClick={HandleNavegateCalling}
-                                            sx={{ color: "green" }}
+
+                                    <div style={{
+                                        display: 'flex',
+                                        textAlign: 'center',
+                                        justifyContent: 'space-between',
+                                        Width: "100%",
+                                        alignContent: 'center',
+                                        alignItems: 'center',
+                                    }}>
+                                        <ListItemText
+                                            sx={{
+                                                color: "black",
+                                                marginRight: "80px",
+                                                justifyContent: 'center',
+                                                textAlign: 'center',
+                                                alignContent: 'center',
+                                                alignItems: 'center',
+                                                display: 'flex',
+                                                Width: "100%",
+                                            }}
+
                                         >
-                                            <PhoneIcon />
-                                        </IconButton>
-                                    </ListItemIcon>
+                                            <Typography>
+                                                {`${distance || 'Calculando...'}`}
+                                            </Typography>
+                                        </ListItemText>
+                                        <FormControl fullWidth margin="normal">
+                                            <InputLabel>Precio</InputLabel>
+                                            <Select
+                                                value={Precio}
+                                                label="Rol"
+                                                onChange={(e) => setPrecio(e.target.value)}
+                                                variant="filled"
+                                                sx={{
+                                                    width: "100%",
+                                                    backgroundColor: "#EDEDED",
+                                                    borderRadius: 2,
+                                                    "& .MuiFilledInput-underline:before": {
+                                                        borderBottom: "none", // Elimina la línea inferior en el estado normal
+                                                    },
+                                                    "& .MuiFilledInput-underline:after": {
+                                                        borderBottom: "none", // Elimina la línea inferior en el estado activo/foco
+                                                    },
+                                                    "& .MuiFilledInput-underline:hover:before": {
+                                                        borderBottom: "none", // Elimina la línea inferior al pasar el ratón por encima
+                                                    },
+                                                    "& .MuiFilledInput-root": {
+                                                        backgroundColor: "rgba(0,0,0,0)", // Hace el fondo transparente
+                                                        "&:hover": {
+                                                            backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente al pasar el ratón por encima
+                                                        },
+                                                        "&.Mui-focused": {
+                                                            backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente en el estado de foco
+                                                        },
+                                                    },
+                                                }}>
+                                                {[1.25, 2.50, 3.75, 5.00, 6.25, 7.50, 8.75, 10.00].map((precio, index) => (
+                                                    <MenuItem key={index} value={precio}>
+                                                        ${precio.toFixed(2)}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    </div>
                                 </ListItem>
                             ))}
                         </List>
@@ -719,6 +791,7 @@ const TextFieldMaps = () => {
                             color: "#f4f4f4",
                             width: "100%",
                             background: "#000",
+                            height: "60px",
                         }}
                     >
                         Seleccionar Cabbie
