@@ -250,8 +250,15 @@ const TextFieldMaps = () => {
             if (selectedTaxiUser) {
                 // Navega y pasa el estado adicional
                 navigate(`/chat/${selectedTaxiUser.uid}`, {
-                    state: { originAddress, destinationAddress },
+                    state: {
+                        originAddress,
+                        destinationAddress,
+                        precio: Precio,
+                        distancia: distance
+                    },
+
                 });
+
             } else {
                 console.error("Taxista seleccionado no válido.");
             }
@@ -343,9 +350,7 @@ const TextFieldMaps = () => {
             );
 
             set(taxistaRef, ubicacion)
-                .then(() => {
-                    console.log("Ubicación actualizada con éxito.");
-                })
+                 
                 .catch((error) => {
                     console.error("Error al actualizar la ubicación", error);
                 });
@@ -452,7 +457,17 @@ const TextFieldMaps = () => {
         }
     }, []);
 
-    if (!isLoaded) return <div>Loading...</div>;
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error.message}</div>;
+    }
+
+    if (!user) {
+        return <div>Please log in</div>;
+    }
 
     return (
         <>
@@ -696,7 +711,11 @@ const TextFieldMaps = () => {
                                         cursor: "pointer",
                                         width: '100%',
                                         display: 'flex',
-                                        justifyContent: 'space-between'
+                                        justifyContent: 'space-between',
+                                        '&:hover': {
+                                            backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                                            textDecorationColor: '#fff'
+                                        },
                                     }}
                                     onClick={() => selectTaxiUser(index)}
                                 >
@@ -723,19 +742,14 @@ const TextFieldMaps = () => {
                                         textAlign: 'center',
                                         justifyContent: 'space-between',
                                         Width: "100%",
-                                        alignContent: 'center',
                                         alignItems: 'center',
                                     }}>
                                         <ListItemText
                                             sx={{
                                                 color: "black",
-                                                marginRight: "80px",
-                                                justifyContent: 'center',
+                                                mx: 'auto',
                                                 textAlign: 'center',
-                                                alignContent: 'center',
-                                                alignItems: 'center',
                                                 display: 'flex',
-                                                Width: "100%",
                                             }}
 
                                         >
@@ -792,6 +806,9 @@ const TextFieldMaps = () => {
                             width: "100%",
                             background: "#000",
                             height: "60px",
+                            '&:hover': {
+                                backgroundColor: '#242424', // Ejemplo de interactividad
+                            },
                         }}
                     >
                         Seleccionar Cabbie

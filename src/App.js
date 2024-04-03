@@ -4,7 +4,7 @@ import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
 import HomeScreen from "./Screens/Cliente/Home/HomeScreen";
 //import Navbar from "./Components/Navbar/Navbar";
-import Journey from "./Screens/Cliente/Journey/Journey";
+//import Journey from "./Screens/Cliente/Journey/Journey";
 import Profile from "./Screens/Cliente/Profile/Profile";
 import ConversationMessage from "./Components/Chat/ConversationMessage.jsx/ConversationMessage";
 import CallMessageConversationMessage from "./Components/Call/CallMessageConversationMessage";
@@ -70,7 +70,7 @@ function App() {
 
           <Route path="/ChatList" element={<ChatList />} />
           <Route path="/ChatMessage" element={<ChatMessage />} />
-          <Route path="chat/:UsuarioId" element={<ChatConversationClient />} />
+          <Route path="/chat/:UsuarioId" element={<ChatConversationClient />} />
           <Route path="/chat/:chatId" element={<TaxiChatComponent />} />
         </Route>
       </Routes>

@@ -52,7 +52,7 @@ import {
     uploadBytesResumable,
     getDownloadURL,
 } from "firebase/storage";
-import { remove } from 'firebase/database';
+import { remove } from "firebase/database";
 import { useSpring, animated } from "react-spring";
 
 function ChatConversationClient() {
@@ -105,6 +105,9 @@ function ChatConversationClient() {
     const [imagePreview, setImagePreview] = useState(null);
     const [openDialog, setOpenDialog] = useState(false);
 
+    // Estado para llevar un registro de las rutas enviadas
+    const [sentRoutes, setSentRoutes] = useState([]);
+
     const handleCapture = ({ target }) => {
         const fileReader = new FileReader();
         const file = target.files[0];
@@ -128,7 +131,6 @@ function ChatConversationClient() {
             return;
         }
 
-
         // Obtiene una referencia al almacenamiento de Firebase
         const storage = getStorage();
         const storagePath = `Users/UsersClient/imagesclient/${new Date().getTime()}`;
@@ -148,7 +150,6 @@ function ChatConversationClient() {
                         const progress =
                             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                         console.log("Upload is " + progress + "% done");
-
                     },
                     (error) => {
                         // Manejar errores aquí
@@ -160,7 +161,6 @@ function ChatConversationClient() {
                     },
 
                     () => {
-
                         // Obtiene la URL de la imagen subida y guarda el mensaje en la base de datos
                         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
                             console.log("File available at", downloadURL);
@@ -170,29 +170,35 @@ function ChatConversationClient() {
 
                             // Guarda el mensaje en la base de datos
                             const database = getDatabase();
-                            const chatRef = dbRef(database, `Chats/${chatId}/messages/imagesclient`);
+                            const chatRef = dbRef(
+                                database,
+                                `Chats/${chatId}/messages/imagesclient`
+                            );
                             const newMessageRef = push(chatRef);
                             set(newMessageRef, {
                                 senderId: user.uid,
                                 imageUrl: downloadURL, // Usa la URL de la imagen como parte del mensaje
                                 timestamp: Date.now(),
                                 type: "image", // Puedes usar este campo para diferenciar mensajes de texto e imágenes
-
-                            }).then(() => console.log("Imagen guardada en la base de datos con éxito."))
-                                .catch((error) => console.error("Error al guardar la imagen en la base de datos:", error));
+                            })
+                                .then(() =>
+                                    console.log("Imagen guardada en la base de datos con éxito.")
+                                )
+                                .catch((error) =>
+                                    console.error(
+                                        "Error al guardar la imagen en la base de datos:",
+                                        error
+                                    )
+                                );
 
                             // Limpia la previsualización y cierra el diálogo
                             setImagePreview(null);
                             setOpenDialog(false);
-
                         });
                     }
                 );
-            }
-            );
+            });
     };
-
-
 
     //Variables para el role
     const chatId =
@@ -240,13 +246,14 @@ function ChatConversationClient() {
             deleteMessage(selectedMessage);
             // El manejo de mensajes y estado de snackbar se puede mover a la función deleteMessage
         } else {
-            setSnackbarMessage(`Action ${action} selected for message: ${selectedMessage}`);
+            setSnackbarMessage(
+                `Action ${action} selected for message: ${selectedMessage}`
+            );
             setSnackbarSeverity("info");
             setSnackbarOpen(true);
         }
         handleCloseMenu();
     };
-
 
     //anchor
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -452,9 +459,29 @@ function ChatConversationClient() {
         }
     };
 
+    // Verifica si una ruta ya ha sido enviada
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const routeAlreadySent = (origin, destination) => {
+        return sentRoutes.some(
+            (route) => route.origin === origin && route.destination === destination
+        );
+    };
+
+    // Marca una ruta como enviada
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const markRouteAsSent = (origin, destination) => {
+        setSentRoutes([...sentRoutes, { origin, destination }]);
+    };
+
     //Carga del mapa de la ruta
     useEffect(() => {
         if (originAddress && destinationAddress) {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+
+            // Suponiendo que tienes un identificador único para cada viaje o usuario
+            const viajeId = `viaje_${now.getTime()}`;
+
             // Simula el envío de un mensaje con la información de la ruta
             const routeMessage = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(
                 originAddress
@@ -464,15 +491,20 @@ function ChatConversationClient() {
 
             const mapImageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(
                 originAddress
-            )}&destination=${encodeURIComponent(
+            )}&zoom=12&size=400x400&markers=color:red|label:O|${encodeURIComponent(
+                originAddress
+            )}&markers=color:blue|label:D|${encodeURIComponent(
                 destinationAddress
-            )}&travelmode=driving&zoom=12&size=400x400&markers=color:red|label:M|40.712775,-74.005973&key=AIzaSyCExz27MMGSdeZw-l1-qReRPSfEUgNV4po`;
+            )}&key=AIzaSyCExz27MMGSdeZw-l1-qReRPSfEUgNV4po`;
 
-            const now = new Date();
-            const timeString = now.toLocaleTimeString();
-            console.log(timeString);
-            // Suponiendo que tienes un identificador único para cada viaje o usuario
-            const viajeId = `viaje_${now.getTime()}`;
+            if (
+                originAddress &&
+                destinationAddress &&
+                !routeAlreadySent(originAddress, destinationAddress)
+            ) {
+                // Actualiza el estado o la base de datos para marcar que esta ruta ya fue enviada
+                markRouteAsSent(originAddress, destinationAddress);
+            }
 
             const database = getDatabase();
             const viajesRef = ref(
@@ -488,24 +520,17 @@ function ChatConversationClient() {
                 mapImageUrl,
                 time: timeString,
                 // Puedes agregar cualquier otro detalle aquí
-            })
-                .then(() => {
-                    setSnackbarMessage("Viaje guardado con éxito.");
-                    setSnackbarSeverity("success");
-                    setSnackbarOpen(true);
-                })
-                .catch((error) => {
-                    setSnackbarMessage("Error al guardar el viaje:", error);
-                    setSnackbarSeverity("error");
-                    setSnackbarOpen(true);
-                });
+            }).catch((error) => {
+                setSnackbarMessage("Error al guardar el viaje:", error);
+                setSnackbarSeverity("error");
+                setSnackbarOpen(true);
+            });
 
             const createLocationMessage = (
                 routeMessage,
                 mapImageUrl,
                 origin,
-                destination,
-
+                destination
             ) => {
                 return {
                     type: "location",
@@ -515,7 +540,7 @@ function ChatConversationClient() {
                     destination,
                     textrut: `Ruta a ${destinationAddress}.`,
                     sender: "system",
-                    time: timeString
+                    time: timeString,
                 };
             };
 
@@ -528,14 +553,18 @@ function ChatConversationClient() {
                     destinationAddress,
                     timeString
                 ),
-
             ]);
             //console.log("Route Message URL:", routeMessage);
             //console.log("Map Image URL:", mapImageUrl);
             // Aquí, después de actualizar el estado.
-
         }
-    }, [originAddress, destinationAddress, chatId]);
+    }, [
+        originAddress,
+        destinationAddress,
+        chatId,
+        routeAlreadySent,
+        markRouteAsSent,
+    ]);
 
     // MessageText.js
     function MessageText({ msg, userUid, participantsInfo }) {
@@ -543,23 +572,18 @@ function ChatConversationClient() {
         return (
             <>
                 <ListItem
-
                     sx={{
                         display: "flex",
                         alignItems: "center",
-                        bgcolor:
-                            msg.senderId === user.uid ? "#808080" : "#f0f0f0",
+                        bgcolor: msg.senderId === user.uid ? "#808080" : "#f0f0f0",
                         color: msg.senderId === user.uid ? "#fff" : "#000",
                         borderRadius: "20px",
                         mb: 1,
                         maxWidth: "100%",
-                        alignSelf:
-                            msg.senderId === user.uid ? "flex-end" : "flex-start",
+                        alignSelf: msg.senderId === user.uid ? "flex-end" : "flex-start",
                     }}
                 >
-                    <ListItemText
-
-                    >
+                    <ListItemText>
                         <Typography
                             variant="body2"
                             color={msg.senderId === user.uid ? "#f4f4f4" : "#000"}
@@ -569,12 +593,11 @@ function ChatConversationClient() {
                         </Typography>
                         <Typography
                             variant="body3"
-                            color={msg.senderId === user.uid ? "#f4f4f4" : "#000"}>
+                            color={msg.senderId === user.uid ? "#f4f4f4" : "#000"}
+                        >
                             {new Date(msg.timestamp).toLocaleTimeString()}
                         </Typography>
-
                     </ListItemText>
-
                 </ListItem>
             </>
         );
@@ -600,7 +623,6 @@ function ChatConversationClient() {
             });
     };
 
-
     if (loading) {
         return <div>Loading...</div>;
     }
@@ -616,7 +638,6 @@ function ChatConversationClient() {
     return (
         <>
             <animated.div style={fade}>
-
                 <AppBar
                     position="fixed"
                     sx={{
@@ -751,7 +772,6 @@ function ChatConversationClient() {
                                         gap: "20px",
                                     }}
                                 >
-
                                     <>
                                         {msg.senderId !== user.uid &&
                                             // Asegúrate de que tienes información del remitente antes de intentar mostrarla
@@ -775,7 +795,10 @@ function ChatConversationClient() {
                                                     style={{
                                                         cursor: "pointer",
                                                         maxWidth: "80%",
-                                                        alignSelf: msg.senderId === user.uid ? "flex-start" : "flex-end",
+                                                        alignSelf:
+                                                            msg.senderId === user.uid
+                                                                ? "flex-start"
+                                                                : "flex-end",
                                                     }}
                                                     onClick={() => window.open(msg.link, "_blank")}
                                                 >
@@ -787,9 +810,11 @@ function ChatConversationClient() {
                                                         alt="Mapa de la ruta"
                                                         style={{
                                                             width: "200px",
-                                                            height: "20vh", borderRadius: "20px"
+                                                            height: "20vh",
+                                                            borderRadius: "20px",
                                                         }}
                                                     />
+
                                                     <Typography variant="body2" color="textSecondary">
                                                         {msg.time}, Toque para ver detalles
                                                     </Typography>
@@ -798,32 +823,42 @@ function ChatConversationClient() {
                                         ) : (
                                             <>
                                                 <div onClick={(event) => handleOpenMenu(event, msg)}>
-                                                    <MessageText msg={msg} userUid={user.uid} participantsInfo={participantsInfo} />
+                                                    <MessageText
+                                                        msg={msg}
+                                                        userUid={user.uid}
+                                                        participantsInfo={participantsInfo}
+                                                    />
                                                 </div>
                                             </>
                                         )}
-                                        {msg.senderId === user.uid && images.map((image) => (
-                                            <div style={{
-                                                bgcolor:
-                                                    msg.senderId === user.uid ? "#808080" : "#f0f0f0",
-                                                color: msg.senderId === user.uid ? "#fff" : "#000",
-                                                cursor: "pointer",
-                                                maxWidth: "80%",
-                                                alignSelf: msg.senderId === user.uid ? "flex-start" : "flex-end",
-                                            }}
-                                                onClick={(event) => handleOpenMenu(event, msg)}>
-                                                <img
-                                                    key={image.id}
-                                                    src={image.url}
-                                                    alt="Imagen enviada"
+                                        {msg.senderId === user.uid &&
+                                            images.map((image) => (
+                                                <div
                                                     style={{
-                                                        maxWidth: "200px",
-                                                        maxHeight: "200px",
-                                                        borderRadius: "10px"
+                                                        bgcolor:
+                                                            msg.senderId === user.uid ? "#808080" : "#f0f0f0",
+                                                        color: msg.senderId === user.uid ? "#fff" : "#000",
+                                                        cursor: "pointer",
+                                                        maxWidth: "80%",
+                                                        alignSelf:
+                                                            msg.senderId === user.uid
+                                                                ? "flex-start"
+                                                                : "flex-end",
                                                     }}
-                                                />
-                                            </div>
-                                        ))}
+                                                    onClick={(event) => handleOpenMenu(event, msg)}
+                                                >
+                                                    <img
+                                                        key={image.id}
+                                                        src={image.url}
+                                                        alt="Imagen enviada"
+                                                        style={{
+                                                            maxWidth: "200px",
+                                                            maxHeight: "200px",
+                                                            borderRadius: "10px",
+                                                        }}
+                                                    />
+                                                </div>
+                                            ))}
                                         {msg.senderId === user.uid && (
                                             <>
                                                 <Avatar
@@ -836,7 +871,6 @@ function ChatConversationClient() {
                                             </>
                                         )}
                                     </>
-
                                 </div>
                             </React.Fragment>
                         ))}
