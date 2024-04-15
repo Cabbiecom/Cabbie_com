@@ -19,6 +19,7 @@ import { ArrowBackIos } from "@mui/icons-material";
 //import logo from '../../Assets/images/Cabbie.png';
 import { ReactComponent as CabbieSVG } from "./svg/security_on.svg";
 import { ReactComponent as PersonSVG } from "./svg/personal_info_re.svg";
+
 const Legal = () => {
     //Navegation
     const navigateanv = useNavigate();
@@ -67,7 +68,8 @@ const Legal = () => {
                 <div style={{ background: "#f4f4f4" }}>
                     <AppBar
                         position="sticky"
-                        sx={{ background: "transparent", boxShadow: "none" }}
+                        sx={{ background: "transparent",
+                         boxShadow: "none" }}
                     >
                         <Toolbar
                             sx={{
@@ -167,7 +169,9 @@ const Legal = () => {
                         </Toolbar>
                     </AppBar>
                     <div id="terminos">
-                        <Parallax bgImage="../../Assets/images/Cabbie.png" strength={500}>
+                        <Parallax 
+                        bgImage="../../Assets/images/Cabbie.png" 
+                        strength={500}>
                             <Box
                                 sx={{
                                     height: 1800,

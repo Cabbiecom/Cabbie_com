@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from "react";
-import PropTypes from "prop-types";
-import { Global } from "@emotion/react";
-import { styled } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
-import { grey } from "@mui/material/colors";
-import { Box, Avatar, ListItemIcon, IconButton } from "@mui/material";
+import { Avatar, ListItemIcon, IconButton } from "@mui/material";
 
 import Typography from "@mui/material/Typography";
 
@@ -15,8 +10,6 @@ import MenuItem from "@mui/material/MenuItem";
 import Divider from "@mui/material/Divider";
 import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
-import MenuIcon from "@mui/icons-material/Menu";
-import StarIcon from "@mui/icons-material/Star";
 import { useNavigate } from "react-router-dom";
 import { Chat, DataObjectOutlined, SosOutlined } from "@mui/icons-material";
 import LocalTaxiIcon from "@mui/icons-material/LocalTaxi";
@@ -100,6 +93,18 @@ const HomeTaxista = () => {
         });
     }
   }, [user, database]);
+
+  if (loading) {
+      return <div>Loading...</div>;
+  }
+
+  if (error) {
+      return <div>Error: {error.message}</div>;
+  }
+
+  if (!user) {
+      return <div>Please log in</div>;
+  }
 
   return (
     <>
@@ -189,6 +194,7 @@ const HomeTaxista = () => {
             </ListItemIcon>
             Configuraciones
           </MenuItem>
+          <Divider />
           <MenuItem onClick={handleLogout}>
             <ListItemIcon>
               <Logout fontSize="small" />

@@ -41,11 +41,7 @@ import {
     ref as dbRef,
     set,
     get,
-    onValue,
-    query,
     ref,
-    orderByChild,
-    equalTo,
 } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import StarIcon from "@mui/icons-material/Star";
@@ -103,7 +99,6 @@ const TextFieldMaps = () => {
     //constante de la distancia
     const [distance, setDistance] = useState(null); // Añade esto al estado de tu componente
 
-
     // Constantes para la Conexión Taxista
     const [taxiUsers, setTaxiUsers] = useState([]);
     const [selectedTaxiUserIndex, setSelectedTaxiUserIndex] = useState(null);
@@ -113,6 +108,9 @@ const TextFieldMaps = () => {
     const [container, setContainer] = useState(undefined);
     const [mapVisible, setMapVisible] = useState(false);
     const [open, setOpen] = useState(false);
+
+    // Estado para llevar un registro de las rutas enviadas
+    const [sentRoutes, setSentRoutes] = useState([]);
 
     // Constantes para obtener la ubicación
     const [originAddress, setOriginAddress] = useState("");
@@ -218,19 +216,20 @@ const TextFieldMaps = () => {
     };
 
     const HandleNavegateComponents = (taxiUserId) => {
-        if (originAddress && destinationAddress) {
-            navigate(`/chat/${taxiUserId}`, {
+        if (originAddress && destinationAddress && Precio &&
+            distance) {
+            navigate(`/Chats/${taxiUserId}`, {
                 state: {
                     originAddress,
                     destinationAddress,
+                    Precio,
+                    distance,
                 },
             });
         } else {
             console.error("Origen o destino no especificado.");
         }
     };
-
-
 
     const handleVerMapsClick = () => {
         setMapVisible(true);
@@ -243,30 +242,87 @@ const TextFieldMaps = () => {
         setSelectedTaxiUserIndex(index);
     };
 
+    const routeAlreadySent = (origin, destination) => {
+        return sentRoutes.some(
+            (route) => route.origin === origin && route.destination === destination
+        );
+    };
+
+    const markRouteAsSent = (origin, destination) => {
+        setSentRoutes([...sentRoutes, { origin, destination }]);
+    };
+
     // Función para enviar parámetros de ubicación al chat del taxista seleccionado
     const handleSelectCabbie = () => {
-        if (selectedTaxiUserIndex !== null) {
-            const selectedTaxiUser = taxiUsers[selectedTaxiUserIndex];
-            if (selectedTaxiUser) {
-                // Navega y pasa el estado adicional
-                navigate(`/chat/${selectedTaxiUser.uid}`, {
-                    state: {
-                        originAddress,
-                        destinationAddress,
-                        precio: Precio,
-                        distancia: distance
-                    },
+        if (selectedTaxiUserIndex == null || !Precio || !originAddress || !destinationAddress) {
+            console.error("Información del viaje incompleta o taxista no seleccionado.");
+            return;
+        }
 
+        const selectedTaxiUser = taxiUsers[selectedTaxiUserIndex];
+
+        if (!selectedTaxiUser || !selectedTaxiUser.uid) {
+            console.error("No se pudo obtener información del taxista seleccionado.");
+            return;
+        }
+
+        const userId = user.uid; // Asegúrate de que el UID del usuario está disponible
+        const taxiUserId = selectedTaxiUser.uid;
+        const chatId = userId < taxiUserId ? `${userId}_${taxiUserId}` : `${taxiUserId}_${userId}`;
+
+        const now = new Date();
+        const viajeId = `viaje_${now.getTime()}`;
+
+        const timeString = now.toLocaleTimeString();
+
+        const routeMessage = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(originAddress)}&destination=${encodeURIComponent(destinationAddress)}&travelmode=driving`;
+
+        const mapImageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(originAddress)}&zoom=12&size=400x400&markers=color:red|label:O|
+        ${encodeURIComponent(originAddress)}&markers=color:blue|label:D|
+        ${encodeURIComponent(destinationAddress)}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`;
+
+        const tripData = {
+            originAddress,
+            destinationAddress,
+            precio: Precio,
+            distancia: distance,
+            routeMessage,
+            mapImageUrl,
+            time: timeString,
+            sender: user.uid,
+            type: "location",
+        }
+
+        const database = getDatabase();
+        // Crear o actualizar el chat
+        const chatRef = ref(database, `Chats/${chatId}`);
+
+        get(chatRef).then((snapshot) => {
+            if (!snapshot.exists()) {
+                // Si el chat no existe, establecer participantes
+                set(ref(database, `Chats/${chatId}/participants`), {
+                    [userId]: true,
+                    [taxiUserId]: true,
                 });
-
-            } else {
-                console.error("Taxista seleccionado no válido.");
             }
-        } else {
-            console.error("No se ha seleccionado ningún taxista.");
+            // Enviar el mensaje del viaje al chat
+            const messageRef = ref(database, `Chats/${chatId}/messages/Viajes/${viajeId}`);
+            set(messageRef, tripData).then(() => {
+                console.log("Viaje agregado al chat con éxito.");
+                navigate(`/Chats/${chatId}`, { state: { chatId } });
+            }).catch((error) => {
+                console.error("Error al agregar viaje al chat:", error);
+            });
+        }).catch((error) => {
+            console.error("Error al verificar o crear el chat:", error);
+        });
+        // Asegúrate de que esta ruta aún no ha sido enviada, o actualiza tu lógica según necesites
+        if (!routeAlreadySent(originAddress, destinationAddress)) {
+            markRouteAsSent(originAddress, destinationAddress);
         }
     };
-    // Función para obtener la ubicación del taxista seleccionado
+
+
 
     //Compartir mapa
     const handleShareMapsClick = async () => {
@@ -319,6 +375,7 @@ const TextFieldMaps = () => {
             console.log("No se encontró la ubicación del taxista");
         }
     };
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const capturarUbicacionTaxista = () => {
         if (navigator.geolocation) {
@@ -339,6 +396,7 @@ const TextFieldMaps = () => {
             console.error("La Geolocalización no está soportada por este navegador.");
         }
     };
+
     const actualizarUbicacionTaxistaEnFirebase = (ubicacion) => {
         if (user) {
             // Asume que 'user' contiene la información del usuario autenticado
@@ -350,7 +408,9 @@ const TextFieldMaps = () => {
             );
 
             set(taxistaRef, ubicacion)
-                 
+                .then(() => {
+                    console.log("Ubicación actualizada con éxito.");
+                })
                 .catch((error) => {
                     console.error("Error al actualizar la ubicación", error);
                 });
@@ -457,6 +517,12 @@ const TextFieldMaps = () => {
         }
     }, []);
 
+    if (Precio === undefined) {
+        console.error('El precio no está definido.');
+        return; // Salir de la función para evitar escribir en Firebase
+    }
+
+    if (!isLoaded) return <div>Loading...</div>;
     if (loading) {
         return <div>Loading...</div>;
     }
@@ -709,12 +775,12 @@ const TextFieldMaps = () => {
                                         borderRadius: 2,
                                         mb: 1,
                                         cursor: "pointer",
-                                        width: '100%',
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        '&:hover': {
-                                            backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                                            textDecorationColor: '#fff'
+                                        width: "100%",
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        "&:hover": {
+                                            backgroundColor: "rgba(0, 0, 0, 0.04)",
+                                            textDecorationColor: "#fff",
                                         },
                                     }}
                                     onClick={() => selectTaxiUser(index)}
@@ -736,25 +802,25 @@ const TextFieldMaps = () => {
                                         secondary={generateRating(taxiUser.rating)}
                                     />
 
-
-                                    <div style={{
-                                        display: 'flex',
-                                        textAlign: 'center',
-                                        justifyContent: 'space-between',
-                                        Width: "100%",
-                                        alignItems: 'center',
-                                    }}>
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            textAlign: "center",
+                                            justifyContent: "space-between",
+                                            Width: "100%",
+                                            alignItems: "center",
+                                        }}
+                                    >
                                         <ListItemText
                                             sx={{
                                                 color: "black",
-                                                mx: 'auto',
-                                                textAlign: 'center',
-                                                display: 'flex',
+                                                mx: "auto",
+                                                textAlign: "center",
+                                                display: "flex",
                                             }}
-
                                         >
                                             <Typography>
-                                                {`${distance || 'Calculando...'}`}
+                                                {`${distance || "Calculando..."}`}
                                             </Typography>
                                         </ListItemText>
                                         <FormControl fullWidth margin="normal">
@@ -786,12 +852,15 @@ const TextFieldMaps = () => {
                                                             backgroundColor: "rgba(0,0,0,0)", // Mantiene el fondo transparente en el estado de foco
                                                         },
                                                     },
-                                                }}>
-                                                {[1.25, 2.50, 3.75, 5.00, 6.25, 7.50, 8.75, 10.00].map((precio, index) => (
-                                                    <MenuItem key={index} value={precio}>
-                                                        ${precio.toFixed(2)}
-                                                    </MenuItem>
-                                                ))}
+                                                }}
+                                            >
+                                                {[1.25, 2.5, 3.75, 5.0, 6.25, 7.5, 8.75, 10.0].map(
+                                                    (precio, index) => (
+                                                        <MenuItem key={index} value={precio}>
+                                                            ${precio.toFixed(2)}
+                                                        </MenuItem>
+                                                    )
+                                                )}
                                             </Select>
                                         </FormControl>
                                     </div>
@@ -806,8 +875,8 @@ const TextFieldMaps = () => {
                             width: "100%",
                             background: "#000",
                             height: "60px",
-                            '&:hover': {
-                                backgroundColor: '#242424', // Ejemplo de interactividad
+                            "&:hover": {
+                                backgroundColor: "#242424", // Ejemplo de interactividad
                             },
                         }}
                     >

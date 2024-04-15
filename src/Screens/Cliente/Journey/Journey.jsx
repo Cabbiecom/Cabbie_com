@@ -15,15 +15,15 @@ import MenuItem from "@mui/material/MenuItem";
 import Divider from "@mui/material/Divider";
 import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
-import MenuIcon from "@mui/icons-material/Menu";
-import StarIcon from "@mui/icons-material/Star";
+//import MenuIcon from "@mui/icons-material/Menu";
+//import StarIcon from "@mui/icons-material/Star";
 import { useNavigate } from "react-router-dom";
 import { Chat } from "@mui/icons-material";
-import LocalTaxiIcon from "@mui/icons-material/LocalTaxi";
+//import LocalTaxiIcon from "@mui/icons-material/LocalTaxi";
 import { signOut } from "firebase/auth";
 import { auth } from "../../../Data/Database";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { getDatabase, ref as dbRef, set, get } from "firebase/database";
+import { getDatabase, ref as dbRef, get } from "firebase/database";
 import TextFieldMaps from "../../../widget/TextFieldMaps";
 import { useSpring, animated } from "react-spring";
 
@@ -186,6 +186,19 @@ const Journey = () => {
     );
   };
 
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
+
+  if (!user) {
+    return <div>Please log in</div>;
+  }
+
   return (
     <>
       <animated.div style={fade}>
@@ -199,12 +212,14 @@ const Journey = () => {
               },
             }}
           />
-          <AppBar position="fixed" sx={{
-            zIndex: (theme) => theme.zIndex.drawer + 1,
-            borderBottomLeftRadius: '20px',
-            borderBottomRightRadius: '20px',
-            background: "#000"
-          }}>
+          <AppBar
+            position="fixed"
+            sx={{
+              zIndex: (theme) => theme.zIndex.drawer + 1,
+              borderBottomLeftRadius: '20px',
+              borderBottomRightRadius: '20px',
+              background: "#000"
+            }}>
             <Toolbar>
               <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                 CABBIE
@@ -277,13 +292,13 @@ const Journey = () => {
               <ListItemIcon>
                 <Settings fontSize="small" />
               </ListItemIcon>
-              Settings
+              Configuraciones
             </MenuItem>
             <MenuItem onClick={handleLogout}>
               <ListItemIcon>
                 <Logout fontSize="small" />
               </ListItemIcon>
-              Logout
+              Cerrar Sesión
             </MenuItem>
           </Menu>
           <Box sx={{ textAlign: "center", pt: 1 }}>

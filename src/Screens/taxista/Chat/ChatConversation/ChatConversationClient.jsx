@@ -17,7 +17,6 @@ import {
     ListItem,
     ListItemText,
     AppBar,
-    CssBaseline,
     Toolbar,
     IconButton,
     Typography,
@@ -45,6 +44,7 @@ import {
     push,
     onValue,
     ref,
+    off,
 } from "firebase/database";
 import {
     getStorage,
@@ -81,7 +81,7 @@ function ChatConversationClient() {
     let { taxiUserId, UsuarioId } = useParams();
     //Toma de la ruta golocalitataión
     const location = useLocation();
-    const { originAddress, destinationAddress } = location.state || {};
+    const { originAddress, destinationAddress, Precio, distance } = location.state || {};
     //Constantes del chat
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
@@ -288,44 +288,63 @@ function ChatConversationClient() {
             }
         });
     }, [database]);
+
     // Cargar la información de todos los usuarios al iniciar el componente
     useEffect(() => {
-        if (user) {
-            setName(user.displayName || "Usuario Anónimo");
-            setPhotoURL(user.photoURL || "");
+        // Asegurándonos de que 'user' está definido antes de proceder.
+        if (!user) {
+            console.error("Usuario no definido.");
+            return;
+        }
 
-            // Asumiendo que el `user` tiene un campo `role` que indica si es un usuario o un taxista
-            const userRole = user.role; // Este valor debería venir de alguna parte, tal vez del auth state o un contexto
-            const targetUserId = userRole === "usuario" ? taxiUserId : UsuarioId; // Decidir a quién cargar basado en el rol
 
-            // Forma correcta de usar el path, asegurándose de que esté bien formado
-            const path = `Users/UsersClient/${targetUserId}`;
-            const userRef = dbRef(database, path);
 
-            get(userRef)
-                .then((snapshot) => {
-                    if (snapshot.exists()) {
-                        setUsersInfo(snapshot.val());
-                        setName(setUsersInfo.name);
-                        setPhotoURL(setUsersInfo.imageUrl);
-                    } else {
-                        setSnackbarMessage("No se encontraron datos.");
-                        setSnackbarSeverity("error");
-                        setSnackbarOpen(true);
-                    }
-                })
-                .catch((error) => {
-                    setSnackbarMessage("Error al obtener datos:", error);
+        setName(user.displayName || "Usuario Anónimo");
+        setPhotoURL(user.photoURL || "");
+
+        // Asumimos que el campo 'role' está correctamente definido en 'user'.
+        const userRole = user.role;
+
+        // Utilizamos una validación más estricta para 'taxiUserId' y 'UsuarioId', asegurándonos de que realmente tienen un valor.
+        const targetUserId = userRole === 'taxista' ? (taxiUserId || "") : (UsuarioId || "");
+        if (!targetUserId) {
+            console.error("targetUserId es nulo o indefinido.");
+            setSnackbarMessage("ID de usuario objetivo no definido.");
+            setSnackbarSeverity("error");
+            setSnackbarOpen(true);
+            return;
+        }
+
+        const path = `Users/UsersClient/${targetUserId}`;
+        const userRef = dbRef(database, path);
+
+        get(userRef)
+            .then((snapshot) => {
+                if (snapshot.exists()) {
+                    const userInfo = snapshot.val();
+                    setName(userInfo.name || "Nombre no disponible");
+                    setPhotoURL(userInfo.imageUrl || "URL de imagen no disponible");
+                } else {
+                    console.error("No se encontraron datos para el ID:", targetUserId);
+                    setSnackbarMessage("No se encontraron datos.");
                     setSnackbarSeverity("error");
                     setSnackbarOpen(true);
-                });
-        }
+                }
+            })
+            .catch((error) => {
+                console.error("Error al obtener datos:", error);
+                // Es importante mostrar solo información del error seguro de compartir.
+                setSnackbarMessage(`Error al obtener datos: ${error.message}`);
+                setSnackbarSeverity("error");
+                setSnackbarOpen(true);
+            });
     }, [UsuarioId, database, taxiUserId, user]);
+
 
     // Cargar mensajes y asegurarse de tener la información del usuario
     useEffect(() => {
         const messagesRef = dbRef(database, `Chats/${chatId}/messages`);
-        onValue(messagesRef, (snapshot) => {
+        onValue(messagesRef, async (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 // Asegúrate de que haya datos antes de proceder
@@ -336,62 +355,38 @@ function ChatConversationClient() {
 
                 // Nuevo array para almacenar tanto los mensajes normales como los de ubicación
                 let combinedMessages = [];
+                let newUsersInfo = { ...usersInfo };
 
-                // Iterar sobre los mensajes para obtener información del usuario si es necesario
-                messagesList.forEach((msg) => {
-                    // Agregar el mensaje directamente si no es un mensaje de ubicación
-                    if (msg.type !== "location") {
-                        combinedMessages.push(msg);
-                    } else {
-                        // Cargar mensajes de ubicación desde la ruta específica
-                        const viajeRef = dbRef(
-                            database,
-                            `Chats/${chatId}/messages/Viajes/${msg.id}`
-                        );
-                        get(viajeRef)
-                            .then((viajeSnapshot) => {
-                                if (viajeSnapshot.exists()) {
-                                    const viajeData = viajeSnapshot.val();
-                                    // Asegúrate de que la información de la ubicación esté completa antes de agregarla
-                                    if (
-                                        viajeData.originAddress &&
-                                        viajeData.destinationAddress &&
-                                        viajeData.mapImageUrl
-                                    ) {
-                                        combinedMessages.push({
-                                            ...msg,
-                                            originAddress: viajeData.originAddress,
-                                            destinationAddress: viajeData.destinationAddress,
-                                            imageUrl: viajeData.mapImageUrl,
-                                            link: viajeData.routeMessage,
-                                            // Aquí puedes añadir cualquier otra información relevante de viajeData
-                                        });
-
-                                        // Actualiza el estado de mensajes después de procesar la información de ubicación
-                                        setMessages(combinedMessages);
-                                    }
+                for (let msg of messagesList) {
+                    if (msg.type === "location") {
+                        try {
+                            const viajeSnapshot = await get(dbRef(database, `Chats/${chatId}/messages/Viajes/${msg.id}`));
+                            if (viajeSnapshot.exists()) {
+                                const viajeData = viajeSnapshot.val();
+                                if (viajeData.originAddress && viajeData.destinationAddress && viajeData.mapImageUrl && viajeData.Precio && viajeData.distance) {
+                                    combinedMessages.push({
+                                        ...msg,
+                                        ...viajeData,
+                                        imageUrl: viajeData.mapImageUrl,
+                                        link: viajeData.routeMessage,
+                                    });
                                 }
-                            })
-                            .catch((error) => {
-                                console.error("Error al cargar la ubicación del viaje:", error);
-                            });
-                    }
-
-                    if (msg.senderId && !usersInfo[msg.senderId]) {
-                        fetchUserInfo(msg.senderId).then((userInfo) => {
-                            if (userInfo) {
-                                setUsersInfo((prevInfo) => ({
-                                    ...prevInfo,
-                                    [msg.senderId]: userInfo,
-                                }));
                             }
-                        });
+                        } catch (error) {
+                            console.error("Error al cargar la ubicación del viaje:", error);
+                        }
+                    } else {
+                        combinedMessages.push(msg);
                     }
-                });
-                // Asegúrate de actualizar el estado fuera de la condición de ubicación, para los mensajes normales
-                if (!messagesList.some((msg) => msg.type === "location")) {
-                    setMessages(combinedMessages);
+                    if (msg.senderId && !newUsersInfo[msg.senderId]) {
+                        const userInfo = await fetchUserInfo(msg.senderId);
+                        if (userInfo) {
+                            newUsersInfo[msg.senderId] = userInfo;
+                        }
+                    }
                 }
+                setMessages(combinedMessages);
+                setUsersInfo(newUsersInfo);
             }
         });
     }, [chatId, database, fetchUserInfo, messages, usersInfo]);
@@ -475,96 +470,30 @@ function ChatConversationClient() {
 
     //Carga del mapa de la ruta
     useEffect(() => {
-        if (originAddress && destinationAddress) {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString();
+        const database = getDatabase();
+        const userId = user.uid; // Asegúrate de que el UID del usuario está disponible
+        const chatId = userId < taxiUserId ? `${userId}_${taxiUserId}` : `${taxiUserId}_${userId}`;
+        const messagesRef = ref(database, `Chats/${chatId}/messages`);
 
-            // Suponiendo que tienes un identificador único para cada viaje o usuario
-            const viajeId = `viaje_${now.getTime()}`;
-
-            // Simula el envío de un mensaje con la información de la ruta
-            const routeMessage = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(
-                originAddress
-            )}&destination=${encodeURIComponent(
-                destinationAddress
-            )}&travelmode=driving`;
-
-            const mapImageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(
-                originAddress
-            )}&zoom=12&size=400x400&markers=color:red|label:O|${encodeURIComponent(
-                originAddress
-            )}&markers=color:blue|label:D|${encodeURIComponent(
-                destinationAddress
-            )}&key=AIzaSyCExz27MMGSdeZw-l1-qReRPSfEUgNV4po`;
-
-            if (
-                originAddress &&
-                destinationAddress &&
-                !routeAlreadySent(originAddress, destinationAddress)
-            ) {
-                // Actualiza el estado o la base de datos para marcar que esta ruta ya fue enviada
-                markRouteAsSent(originAddress, destinationAddress);
-            }
-
-            const database = getDatabase();
-            const viajesRef = ref(
-                database,
-                `Chats/${chatId}/messages/Viajes/${viajeId}`
-            );
-
-            // Guardar la información del viaje en Firebase
-            set(viajesRef, {
-                originAddress,
-                destinationAddress,
-                routeMessage,
-                mapImageUrl,
-                time: timeString,
-                // Puedes agregar cualquier otro detalle aquí
-            }).catch((error) => {
-                setSnackbarMessage("Error al guardar el viaje:", error);
-                setSnackbarSeverity("error");
-                setSnackbarOpen(true);
+        onValue(messagesRef, (snapshot) => {
+            const messages = [];
+            snapshot.forEach((childSnapshot) => {
+                const message = childSnapshot.val();
+                // Filtra mensajes por tipo 'location' si solo quieres mostrar esos
+                if (message.type === 'location') {
+                    messages.push({
+                        ...message,
+                        id: childSnapshot.key,
+                    });
+                }
             });
-
-            const createLocationMessage = (
-                routeMessage,
-                mapImageUrl,
-                origin,
-                destination
-            ) => {
-                return {
-                    type: "location",
-                    link: routeMessage,
-                    imageUrl: mapImageUrl,
-                    origin,
-                    destination,
-                    textrut: `Ruta a ${destinationAddress}.`,
-                    sender: "system",
-                    time: timeString,
-                };
-            };
-
-            setMessages((prevMessages) => [
-                ...prevMessages,
-                createLocationMessage(
-                    routeMessage,
-                    mapImageUrl,
-                    originAddress,
-                    destinationAddress,
-                    timeString
-                ),
-            ]);
-            //console.log("Route Message URL:", routeMessage);
-            //console.log("Map Image URL:", mapImageUrl);
-            // Aquí, después de actualizar el estado.
-        }
-    }, [
-        originAddress,
-        destinationAddress,
-        chatId,
-        routeAlreadySent,
-        markRouteAsSent,
-    ]);
+            setMessages(messages); // Suponiendo que tienes un estado llamado 'messages' para almacenar los mensajes del chat
+        });
+        // No olvides desuscribirte de los eventos para evitar fugas de memoria
+        return () => {
+            off(messagesRef);
+        };
+    }, [taxiUserId, user.uid]);
 
     // MessageText.js
     function MessageText({ msg, userUid, participantsInfo }) {
@@ -623,6 +552,14 @@ function ChatConversationClient() {
             });
     };
 
+    // Simula la carga de los datos del usuario o taxista. Debes reemplazar esta parte con tu lógica de carga real.
+    useEffect(() => {
+        setUsersInfo({
+            name,
+            photoURL,
+        })
+    }, [name, photoURL]);
+
     if (loading) {
         return <div>Loading...</div>;
     }
@@ -659,7 +596,7 @@ function ChatConversationClient() {
                             >
                                 <ArrowBackIcon />
                             </IconButton>
-                            <Avatar src={usersInfo.imageUrl} alt={usersInfo.name} />
+                            <Avatar src={usersInfo.photoURL} alt={usersInfo.name} />
                             <Typography
                                 variant="h6"
                                 noWrap
@@ -676,7 +613,10 @@ function ChatConversationClient() {
                             <IconButton
                                 color="inherit"
                                 onClick={() => {
-                                    navigate("/CallMessageConversationMessage");
+                                    // Asume que tienes las IDs del usuario y del taxista disponibles
+                                    const userId = { UsuarioId };
+                                    const driverId = { taxiUserId };
+                                    navigate(`/CallMessageConversationMessage?userId=${userId}&driverId=${driverId}`);
                                 }}
                             >
                                 <PhoneIcon />
@@ -785,7 +725,7 @@ function ChatConversationClient() {
                                                 />
                                             ) : (
                                                 <Avatar
-                                                    src={usersInfo?.imageUrl}
+                                                    src={usersInfo?.photoURL}
                                                     alt={usersInfo?.name || "Nombre Desconocido"}
                                                 />
                                             ))}
@@ -803,7 +743,7 @@ function ChatConversationClient() {
                                                     onClick={() => window.open(msg.link, "_blank")}
                                                 >
                                                     <Typography variant="body2" color="textSecondary">
-                                                        Ruta desde {originAddress} a {destinationAddress}
+                                                        Ruta desde {msg.originAddress} a {msg.destinationAddress}
                                                     </Typography>
                                                     <img
                                                         src={msg.imageUrl}
@@ -814,7 +754,9 @@ function ChatConversationClient() {
                                                             borderRadius: "20px",
                                                         }}
                                                     />
-
+                                                    <Typography variant="body2" color="textSecondary">
+                                                        Valor: {msg.Precio}, distancia: {msg.distance}
+                                                    </Typography>
                                                     <Typography variant="body2" color="textSecondary">
                                                         {msg.time}, Toque para ver detalles
                                                     </Typography>

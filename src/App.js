@@ -19,7 +19,11 @@ import ChatConversationClient from "./Screens/taxista/Chat/ChatConversation/Chat
 import HomeAdmin from "./Screens/Admin/Home/HomeAdmin";
 import Legal from "./Screens/Page/Legal";
 import Dashboard from "./Screens/Admin/Dashboard/Dashboard";
-import { getAuth } from "firebase/auth";
+import {
+  browserLocalPersistence,
+  getAuth,
+  setPersistence,
+} from "firebase/auth";
 import { Navigate, Outlet } from "react-router-dom";
 
 const AuthCheck = () => {
@@ -29,15 +33,39 @@ const AuthCheck = () => {
 
   useEffect(() => {
     const auth = getAuth();
-    auth.onAuthStateChanged((user) => {
-      setIsAuthenticated(!!user);
-      setIsChecking(false);
-    });
+    setPersistence(auth, browserLocalPersistence)
+      .then(() => {
+        auth.onAuthStateChanged((user) => {
+          setIsAuthenticated(!!user);
+          setIsChecking(false);
+        });
+      })
+      .catch((error) => {
+        console.error("Error en la configuración de persistencia", error);
+      });
   }, []);
+
+  function LoadingComponent() {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <div style={{ textAlign: "center" }}>
+          <p>Verificando autenticación...</p>;
+          {/* Aquí podrías añadir un spinner o animación */}
+        </div>
+      </div>
+    );
+  }
 
   if (isChecking) {
     // Opcional: Renderiza algún componente de carga mientras se verifica la autenticación
-    return <div>Verificando autenticación...</div>;
+    return <LoadingComponent />;
   }
 
   return isAuthenticated ? <Outlet /> : <Navigate to="/" replace />;
@@ -70,8 +98,11 @@ function App() {
 
           <Route path="/ChatList" element={<ChatList />} />
           <Route path="/ChatMessage" element={<ChatMessage />} />
-          <Route path="/chat/:UsuarioId" element={<ChatConversationClient />} />
-          <Route path="/chat/:chatId" element={<TaxiChatComponent />} />
+          <Route
+            path="/Chats/:UsuarioId"
+            element={<ChatConversationClient />}
+          />
+          <Route path="/Chats/:chatId" element={<TaxiChatComponent />} />
         </Route>
       </Routes>
     </Router>
