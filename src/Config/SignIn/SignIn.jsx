@@ -6,8 +6,11 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { useNavigate } from "react-router-dom";
 import { getDatabase, ref, get } from "firebase/database";
-import { signInWithEmailAndPassword, getRedirectResult, getAuth } from "firebase/auth";
-import { auth } from "../../Data/Database";
+import {
+    signInWithEmailAndPassword,
+    getRedirectResult,
+    getAuth,
+} from "firebase/auth";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import { AppBar, Card, CardContent, Toolbar } from "@mui/material";
@@ -22,6 +25,7 @@ const SignIn = () => {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const auth = getAuth();
 
     // animation on wisget
     const fade = useSpring({
@@ -47,8 +51,6 @@ const SignIn = () => {
 
     const handleLogin = async (event) => {
         event.preventDefault();
-        const auth = getAuth();
-
         try {
             const userCredential = await signInWithEmailAndPassword(
                 auth,
@@ -61,7 +63,6 @@ const SignIn = () => {
                 window.AndroidApp.onSignIn(true);
                 // Aquí asumimos que el inicio de sesión fue exitoso
                 showAlert("Inicio de sesión exitoso.", "success");
-
             }
 
             // Usuario autenticado correctamente, obtener datos adicionales de Realtime Database
@@ -112,8 +113,8 @@ const SignIn = () => {
         }
     };
 
-
     useEffect(() => {
+        const auth = getAuth();
         getRedirectResult(auth)
             .then((result) => {
                 if (result) {
@@ -137,8 +138,8 @@ const SignIn = () => {
                 position="fixed"
                 sx={{
                     zIndex: (theme) => theme.zIndex.drawer + 1,
-                    borderBottomLeftRadius: '20px',
-                    borderBottomRightRadius: '20px',
+                    borderBottomLeftRadius: "20px",
+                    borderBottomRightRadius: "20px",
                     background: "black",
                     visibility: "visible",
                     display: "-moz-initial",
@@ -148,16 +149,17 @@ const SignIn = () => {
                 }}
             >
                 <Toolbar>
-                    <Typography component="h1" variant="h5" sx={{ color: '#f4f4f4' }}>
+                    <Typography component="h1" variant="h5" sx={{ color: "#f4f4f4" }}>
                         Iniciar sesión
                     </Typography>
                 </Toolbar>
             </AppBar>
             <Box
                 sx={{
-                    width: '100%',
-                    background: '#f4f4f4'
-                }}>
+                    width: "100%",
+                    background: "#f4f4f4",
+                }}
+            >
                 <Container
                     component="main"
                     maxWidth="xs"
@@ -167,16 +169,15 @@ const SignIn = () => {
                         marginBottom: 4,
                         maxWidth: "100%",
                         flexGrow: 1,
-                        height: '100vh',
-
+                        height: "100vh",
                     }}
                 >
                     <Box
                         sx={{
                             display: "flex",
                             flexDirection: "column",
-                            height: '100%',
-                            justifyContent: 'center'
+                            height: "100%",
+                            justifyContent: "center",
                         }}
                     >
                         <animated.div style={fade}>
@@ -198,8 +199,10 @@ const SignIn = () => {
                                 >
                                     <Box
                                         component="form"
-                                        noValidate sx={{ mt: 1 }}
-                                        onSubmit={handleLogin}>
+                                        noValidate
+                                        sx={{ mt: 1 }}
+                                        onSubmit={handleLogin}
+                                    >
                                         <TextField
                                             variant="filled"
                                             margin="normal"
@@ -286,7 +289,6 @@ const SignIn = () => {
                             </Card>
                         </animated.div>
 
-
                         <Box
                             sx={{
                                 marginTop: 2,
@@ -354,7 +356,6 @@ const SignIn = () => {
                                     </CardContent>
                                 </Card>
                             </animated.div>
-
                         </Box>
                         <Snackbar
                             open={openAlert}

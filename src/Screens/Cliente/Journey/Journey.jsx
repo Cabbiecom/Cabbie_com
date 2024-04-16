@@ -37,24 +37,6 @@ const Root = styled("div")(({ theme }) => ({
       : theme.palette.background.default,
 }));
 
-const StyledBox = styled("div")(({ theme }) => ({
-  backgroundColor: theme.palette.mode === "light" ? "#fff" : grey[800],
-}));
-
-const Puller = () => (
-  <Box
-    sx={{
-      width: 30,
-      height: 6,
-      backgroundColor: "#fff",
-      borderRadius: 3,
-      position: "absolute",
-      top: 8,
-      left: "calc(50% - 15px)",
-    }}
-  />
-);
-
 const Journey = () => {
   const [user, loading, error] = useAuthState(auth);
   const [name, setName] = useState("");
@@ -143,8 +125,6 @@ const Journey = () => {
     navigate("/CallMessageConversationMessage");
   };
 
-
-
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -186,7 +166,6 @@ const Journey = () => {
     );
   };
 
-
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -216,10 +195,11 @@ const Journey = () => {
             position="fixed"
             sx={{
               zIndex: (theme) => theme.zIndex.drawer + 1,
-              borderBottomLeftRadius: '20px',
-              borderBottomRightRadius: '20px',
-              background: "#000"
-            }}>
+              borderBottomLeftRadius: "20px",
+              borderBottomRightRadius: "20px",
+              background: "#000",
+            }}
+          >
             <Toolbar>
               <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                 CABBIE
@@ -301,13 +281,12 @@ const Journey = () => {
               Cerrar Sesión
             </MenuItem>
           </Menu>
-          <Box sx={{ textAlign: "center", pt: 1 }}>
+          <Box sx={{ textAlign: "center", pt: 3 }}>
             <TextFieldMaps />
           </Box>
         </Root>
       </animated.div>
     </>
-
   );
 };
 

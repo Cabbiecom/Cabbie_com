@@ -35,10 +35,12 @@ const AuthCheck = () => {
     const auth = getAuth();
     setPersistence(auth, browserLocalPersistence)
       .then(() => {
-        auth.onAuthStateChanged((user) => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+          console.log("Estado del usuario:", user);
           setIsAuthenticated(!!user);
           setIsChecking(false);
         });
+        return () => unsubscribe();
       })
       .catch((error) => {
         console.error("Error en la configuración de persistencia", error);

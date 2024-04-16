@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 // Crear un contexto de autenticación
 const AuthContext = createContext();
@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
     // Aquí puedes agregar la lógica para verificar si el usuario está logueado al cargar la aplicación.
     // Por ejemplo, podrías verificar un token almacenado en localStorage.
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
+        const storedUser = localStorage.getItem("user");
         if (storedUser) {
             setUser(JSON.parse(storedUser));
         }
@@ -23,14 +23,14 @@ export const AuthProvider = ({ children }) => {
     // Aquí deberías añadir la lógica para autenticar al usuario, por ejemplo, hacer una petición a tu servidor
     const login = async (username, password) => {
         // Simulación de inicio de sesión
-        const user = { id: 1, name: 'Usuario Demo', username };
-        localStorage.setItem('user', JSON.stringify(user));
+        const user = { id: 1, name: "Usuario Demo", username };
+        localStorage.setItem("user", JSON.stringify(user));
         setUser(user);
     };
 
     // Función para cerrar sesión
     const logout = () => {
-        localStorage.removeItem('user');
+        localStorage.removeItem("user");
         setUser(null);
     };
 
@@ -41,9 +41,5 @@ export const AuthProvider = ({ children }) => {
         logout,
     };
 
-    return (
-        <AuthContext.Provider value={value}>
-            {children}
-        </AuthContext.Provider>
-    );
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
