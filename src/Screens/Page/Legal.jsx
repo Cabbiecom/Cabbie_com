@@ -68,8 +68,7 @@ const Legal = () => {
                 <div style={{ background: "#f4f4f4" }}>
                     <AppBar
                         position="sticky"
-                        sx={{ background: "transparent",
-                         boxShadow: "none" }}
+                        sx={{ background: "transparent", boxShadow: "none" }}
                     >
                         <Toolbar
                             sx={{
@@ -149,7 +148,10 @@ const Legal = () => {
                                         width: "500px",
                                     }}
                                 >
-                                    <Link to="#terminos" onClick={() => scrollToSection("#terminos")}>
+                                    <Link
+                                        to="#terminos"
+                                        onClick={() => scrollToSection("#terminos")}
+                                    >
                                         Términos y Condiciones
                                     </Link>
                                     <Link
@@ -158,10 +160,16 @@ const Legal = () => {
                                     >
                                         Privacidad
                                     </Link>
-                                    <Link to="#tutorial" onClick={() => scrollToSection("#tutorial")}>
+                                    <Link
+                                        to="#tutorial"
+                                        onClick={() => scrollToSection("#tutorial")}
+                                    >
                                         Tutorial
                                     </Link>
-                                    <Link to="#acercade" onClick={() => scrollToSection("#acercade")}>
+                                    <Link
+                                        to="#acercade"
+                                        onClick={() => scrollToSection("#acercade")}
+                                    >
                                         Acerca de
                                     </Link>
                                 </Box>
@@ -169,9 +177,7 @@ const Legal = () => {
                         </Toolbar>
                     </AppBar>
                     <div id="terminos">
-                        <Parallax 
-                        bgImage="../../Assets/images/Cabbie.png" 
-                        strength={500}>
+                        <Parallax bgImage="../../Assets/images/Cabbie.png" strength={500}>
                             <Box
                                 sx={{
                                     height: 1800,
@@ -182,16 +188,19 @@ const Legal = () => {
                                     textAlign: "center",
                                 }}
                             >
-                                <Typography variant="h2" component="h2" gutterBottom>
-                                    Términos y Condiciones
-                                </Typography>
+                                <div style={{ marginTop: "40px" }}>
+                                    <Typography variant="h3" component="h3" gutterBottom>
+                                        Términos y Condiciones
+                                    </Typography>
+                                </div>
+
                                 <animated.div>
                                     <Container maxWidth="md">
                                         <Box
                                             elevation={3}
                                             sx={{
                                                 padding: "24px",
-                                                marginTop: "24px",
+                                                marginTop: "20px",
                                                 marginBottom: "24px",
                                             }}
                                         >
@@ -201,21 +210,23 @@ const Legal = () => {
 
                                             <Typography variant="body1" paragraph>
                                                 UTI ha certificado al Departamento de Comercio de los
-                                                Estados Unidos que se adhiere a (1) la UE-EE. UU. Principios
-                                                del Marco de Privacidad de los datos relativos al
-                                                tratamiento de los datos personales recibidos de los países
-                                                miembros del EEA de acuerdo con UE-EE. UU. DPF, y del Reino
-                                                Unido (y Gibraltar) en función de la Ampliación del Reino
-                                                Unido al DPF UE-EE. UU. y (2) los Principios del Marco de
-                                                Privacidad de los datos relacionados con el tratamiento de
-                                                los datos personales recibidos de Suiza de acuerdo con la
-                                                normativa del DPF Suiza-EE. UU. En caso de conflicto entre
-                                                este aviso y los Principios mencionados anteriormente,
-                                                prevalecerán los Principios. En caso de que los DPF UE-EE.
-                                                UU. o el DPF Suiza-EE. UU. se invalidaran, UTI transferirá
-                                                los datos que estén sujetos a estas certificaciones de
-                                                acuerdo con los otros mecanismos de transferencia de datos
-                                                descritos anteriormente.
+                                                Estados Unidos que se adhiere a (1) la UE-EE. UU.
+                                                Principios del Marco de Privacidad de los datos
+                                                relativos al tratamiento de los datos personales
+                                                recibidos de los países miembros del EEA de acuerdo con
+                                                UE-EE. UU. DPF, y del Reino Unido (y Gibraltar) en
+                                                función de la Ampliación del Reino Unido al DPF UE-EE.
+                                                UU. y (2) los Principios del Marco de Privacidad de los
+                                                datos relacionados con el tratamiento de los datos
+                                                personales recibidos de Suiza de acuerdo con la
+                                                normativa del DPF Suiza-EE. UU. En caso de conflicto
+                                                entre este aviso y los Principios mencionados
+                                                anteriormente, prevalecerán los Principios. En caso de
+                                                que los DPF UE-EE. UU. o el DPF Suiza-EE. UU. se
+                                                invalidaran, UTI transferirá los datos que estén sujetos
+                                                a estas certificaciones de acuerdo con los otros
+                                                mecanismos de transferencia de datos descritos
+                                                anteriormente.
                                             </Typography>
 
                                             <Typography variant="h6" gutterBottom>
@@ -223,32 +234,33 @@ const Legal = () => {
                                             </Typography>
 
                                             <Typography variant="body1" paragraph>
-                                                <b>Ámbito:</b> La certificación DPF de UTI se aplica a los
-                                                datos relacionados con los interesados en el EEA, el Reino
-                                                Unido o Suiza que recibe de otros responsables del
+                                                <b>Ámbito:</b> La certificación DPF de UTI se aplica a
+                                                los datos relacionados con los interesados en el EEA, el
+                                                Reino Unido o Suiza que recibe de otros responsables del
                                                 tratamiento de datos.
                                             </Typography>
 
                                             <Typography variant="body1" paragraph>
-                                                <b>Acceso:</b> Los usuarios tienen derecho a acceder a sus
-                                                datos personales, que están sujetos a la certificación DPF
-                                                de UTI. Para obtener información sobre cómo ejercer este
-                                                derecho, consulte la sección “Elección y transparencia” más
-                                                arriba.
+                                                <b>Acceso:</b> Los usuarios tienen derecho a acceder a
+                                                sus datos personales, que están sujetos a la
+                                                certificación DPF de UTI. Para obtener información sobre
+                                                cómo ejercer este derecho, consulte la sección “Elección
+                                                y transparencia” más arriba.
                                             </Typography>
 
                                             <Typography variant="body1" paragraph>
-                                                <b>Transferencia posterior:</b> UTI es el responsable de la
-                                                transferencia de los datos personales, sujeta a su
+                                                <b>Transferencia posterior:</b> UTI es el responsable de
+                                                la transferencia de los datos personales, sujeta a su
                                                 certificación a terceros.
                                             </Typography>
 
                                             <Typography variant="body1" paragraph>
                                                 <b>Solicitud de las autoridades judiciales:</b> La ley
-                                                aplicable exige que UTI comparta los datos de los usuarios,
-                                                incluidos los que pueden estar sujetos a la certificación de
-                                                UTI, de conformidad con un proceso legal o una solicitud
-                                                gubernamental, incluida la de las fuerzas de seguridad.
+                                                aplicable exige que UTI comparta los datos de los
+                                                usuarios, incluidos los que pueden estar sujetos a la
+                                                certificación de UTI, de conformidad con un proceso
+                                                legal o una solicitud gubernamental, incluida la de las
+                                                fuerzas de seguridad.
                                             </Typography>
 
                                             <Typography variant="body1" paragraph>
@@ -260,10 +272,11 @@ const Legal = () => {
                                             <Typography variant="body1" paragraph>
                                                 <b>Preguntas y disputas:</b> Los pasajeros y los
                                                 destinatarios de las entregas pueden contactar con UTI{" "}
-                                                <Link href="#">aquí</Link>, y los conductores y repartidores
-                                                pueden contactar con UTI <Link href="#">aquí</Link> si
-                                                tienen preguntas sobre nuestro cumplimiento de los
-                                                Principios mencionados anteriormente.
+                                                <Link href="#">aquí</Link>, y los conductores y
+                                                repartidores pueden contactar con UTI{" "}
+                                                <Link href="#">aquí</Link> si tienen preguntas sobre
+                                                nuestro cumplimiento de los Principios mencionados
+                                                anteriormente.
                                             </Typography>
                                         </Box>
                                     </Container>
@@ -285,25 +298,29 @@ const Legal = () => {
                                     alignItems: "center",
                                 }}
                             >
-                                <Typography variant="h2" component="h2" gutterBottom>
+                                <Typography variant="h3" component="h3" gutterBottom>
                                     Privacidad
                                 </Typography>
                                 <animated.div style={props}>
                                     <Container>
                                         <Typography variant="h5" gutterBottom>
-                                            Este aviso se aplica a los usuarios de las aplicaciones, los sitios web y otros servicios de Cabbie en todo el mundo. </Typography>
+                                            Este aviso se aplica a los usuarios de las aplicaciones,
+                                            los sitios web y otros servicios de Cabbie en todo el
+                                            mundo.{" "}
+                                        </Typography>
                                         <br />
                                         <Typography variant="body3" gutterBottom>
                                             Cuando utiliza Cabbie, nos confía su información personal.
-                                            Prometemos no traicionar la confianza de nuestros clientes.
-                                            Para lograr esto, primero queremos ayudarlo a comprender
-                                            nuestras prácticas de privacidad. Este Aviso describe qué
-                                            información personal (“Información”) recopilamos, cómo la
-                                            usamos y divulgamos, y las opciones que usted tiene al
-                                            respecto. Le recomendamos que lo lea junto con nuestra
-                                            información general de privacidad, que destaca información
-                                            sobre nuestras prácticas de privacidad y describe la
-                                            información que recopilamos y cómo la usamos.
+                                            Prometemos no traicionar la confianza de nuestros
+                                            clientes. Para lograr esto, primero queremos ayudarlo a
+                                            comprender nuestras prácticas de privacidad. Este Aviso
+                                            describe qué información personal (“Información”)
+                                            recopilamos, cómo la usamos y divulgamos, y las opciones
+                                            que usted tiene al respecto. Le recomendamos que lo lea
+                                            junto con nuestra información general de privacidad, que
+                                            destaca información sobre nuestras prácticas de privacidad
+                                            y describe la información que recopilamos y cómo la
+                                            usamos.
                                         </Typography>
                                     </Container>
                                 </animated.div>
@@ -347,7 +364,7 @@ const Legal = () => {
                                     alignItems: "center",
                                 }}
                             >
-                                <Typography variant="h2" component="h2" gutterBottom>
+                                <Typography variant="h3" component="h3" gutterBottom>
                                     Tutorial
                                 </Typography>
                                 <Container>
@@ -372,7 +389,7 @@ const Legal = () => {
                                     alignItems: "center",
                                 }}
                             >
-                                <Typography variant="h2" component="h2" gutterBottom>
+                                <Typography variant="h3" component="h3" gutterBottom>
                                     Acerca de
                                 </Typography>
                                 <animated.div style={props}>
@@ -382,13 +399,14 @@ const Legal = () => {
                                         </Typography>
                                         <br />
                                         <Typography variant="body3" gutterBottom>
-                                            Movilizamos al mundo y eso es lo que mejor hacemos. Es nuestra
-                                            verdadera naturaleza. Corre por nuestras venas. Es lo que nos
-                                            saca de la cama cada mañana. Nos motiva a reinventar
-                                            constantemente mejores formas de movernos. A usted. Para todos
-                                            los lugares que quieras visitar. Para todo lo que quieras
-                                            lograr. Cualquier forma que desees obtener ganancias. Mundial.
-                                            tiempo real. A la increíble velocidad actual.
+                                            Movilizamos al mundo y eso es lo que mejor hacemos. Es
+                                            nuestra verdadera naturaleza. Corre por nuestras venas. Es
+                                            lo que nos saca de la cama cada mañana. Nos motiva a
+                                            reinventar constantemente mejores formas de movernos. A
+                                            usted. Para todos los lugares que quieras visitar. Para
+                                            todo lo que quieras lograr. Cualquier forma que desees
+                                            obtener ganancias. Mundial. tiempo real. A la increíble
+                                            velocidad actual.
                                         </Typography>
                                     </Container>
                                 </animated.div>
@@ -423,7 +441,6 @@ const Legal = () => {
                 </div>
             </animated.div>
         </>
-
     );
 };
 
